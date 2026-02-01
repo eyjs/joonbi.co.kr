@@ -1,132 +1,126 @@
-# Joonbi Studio - 외주관리시스템
+# 준비스튜디오 (Joonbi Studio)
 
-외주 프로젝트 관리를 위한 풀스택 웹 애플리케이션
+외주 프로젝트 및 클라이언트 관리를 위한 풀스택 웹 애플리케이션
 
-## Tech Stack
+## 개요
 
-| Layer | Technology |
-|-------|------------|
-| Backend | NestJS, TypeScript, PostgreSQL |
-| Frontend | Next.js (App Router), TypeScript, Tailwind CSS |
-| Database | PostgreSQL 15+ |
+"참고사이트만 주세요, 나머지는 저희가 다 합니다"
 
-## Prerequisites
+기획서 작성 능력이 없는 소상공인/스타트업을 위한 웹개발 외주 서비스.
+AI 자동화로 분석부터 화면설계까지 30분 내 완료.
 
-- Node.js 18.x or higher
-- npm 9.x or higher
-- PostgreSQL 15+
+## 기술 스택
 
-## Project Structure
+| 분류 | 기술 |
+|------|------|
+| **Frontend** | Next.js 14, TypeScript, Tailwind CSS |
+| **Backend** | NestJS 10, Prisma, PostgreSQL 15 |
+| **Infrastructure** | Docker, Docker Compose, Nginx |
+| **Deployment** | Frontend (Vercel), Backend (Docker) |
+| **Automation** | Discord Webhook, Clawdbot |
+
+## 프로젝트 구조
 
 ```
 joonbistudio/
-├── backend/     # NestJS API Server (Port 3001)
-├── frontend/    # Next.js Client (Port 3000)
-├── CLAUDE.md    # Development guidelines
-└── README.md    # This file
+├── apps/
+│   ├── web/              # Next.js Frontend
+│   └── api/              # NestJS Backend
+├── packages/
+│   └── shared/           # 공유 타입/유틸
+├── docs/                 # 문서
+│   ├── 01_서비스기획안.md
+│   ├── 02_기술설계서.md
+│   ├── 03_인프라설계서.md
+│   ├── guides/          # 가이드 문서
+│   └── progress/        # 진행 상황
+├── nginx/               # Nginx 설정
+└── docker-compose.yml   # Docker 설정
 ```
 
-## Quick Start
+## 빠른 시작
 
-### 1. Clone and Setup
+### 1. 환경변수 설정
 
 ```bash
-cd joonbistudio
+cp .env.example .env
+# .env 파일을 열어 필요한 값들을 설정하세요
 ```
 
-### 2. Database Setup
-
-PostgreSQL 데이터베이스 생성:
-
-```sql
-CREATE DATABASE joonbistudio;
-```
-
-### 3. Backend Setup
+### 2. 개발 모드 실행
 
 ```bash
-cd backend
+# Docker Compose로 백엔드 실행
+docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d
 
-# Install dependencies
-npm install
-
-# Create .env file
-cat > .env << EOF
-DATABASE_URL=postgresql://username:password@localhost:5432/joonbistudio
-JWT_SECRET=your-super-secret-key-change-in-production
-JWT_EXPIRATION=1d
-PORT=3001
-NODE_ENV=development
-EOF
-
-# Run development server
-npm run start:dev
+# 또는 개별 실행
+cd apps/api && pnpm install && pnpm dev
+cd apps/web && pnpm install && pnpm dev
 ```
 
-Backend will be available at `http://localhost:3001`
+### 3. 접속
 
-### 4. Frontend Setup
+- **Frontend**: http://localhost:3000
+- **Backend**: http://localhost:4000
+- **API Docs**: http://localhost:4000/api/docs
+- **Database**: localhost:5435
+
+## 배포
+
+### Frontend (Vercel)
+
+1. GitHub 레포지토리 연결
+2. Vercel Dashboard 설정:
+   - Root Directory: `apps/web`
+   - Framework: Next.js
+   - Environment Variables 설정
+
+### Backend (Docker)
 
 ```bash
-cd frontend
-
-# Install dependencies
-npm install
-
-# Create .env.local file
-cat > .env.local << EOF
-NEXT_PUBLIC_API_URL=http://localhost:3001
-EOF
-
-# Run development server
-npm run dev
+docker-compose up -d
 ```
 
-Frontend will be available at `http://localhost:3000`
+## 주요 기능
 
-## Development Commands
+### 자동화 파이프라인
+- Discord 웹훅으로 Clawdbot 트리거
+- AI 기반 프로젝트 분석 (30분)
+- 자동 문서 생성 (분석서, 명세서, 견적서)
+- Stitch MCP 화면설계 자동화
 
-### Backend
+### 프로젝트 관리
+- 상담 관리 (간편/분석)
+- 프로젝트 진행률 추적
+- 산출물 관리
+- 피드백 시스템
 
-| Command | Description |
-|---------|-------------|
-| `npm run start:dev` | Start in development mode with hot-reload |
-| `npm run build` | Build for production |
-| `npm run start:prod` | Start production server |
-| `npm run test` | Run unit tests |
-| `npm run test:e2e` | Run E2E tests |
-| `npm run lint` | Run linter |
+### 결제 시스템
+- NICE 결제 연동
+- 2단계 결제 (계약금 30% + 잔금 70%)
+- 포트폴리오 할인 정책
 
-### Frontend
+## 문서
 
-| Command | Description |
-|---------|-------------|
-| `npm run dev` | Start development server with Turbopack |
-| `npm run build` | Build for production |
-| `npm run start` | Start production server |
-| `npm run lint` | Run ESLint |
+- [서비스 기획안](./docs/01_서비스기획안.md)
+- [기술 설계서](./docs/02_기술설계서.md)
+- [인프라 설계서](./docs/03_인프라설계서.md)
+- [설정 가이드](./docs/guides/SETUP.md)
+- [정리 가이드](./docs/guides/CLEANUP_GUIDE.md)
 
-## Features (Planned)
+## 포트 설정
 
-- [ ] User authentication (JWT)
-- [ ] Client management
-- [ ] Project management
-- [ ] Task tracking
-- [ ] Invoice generation
-- [ ] Payment tracking
-- [ ] Dashboard & Analytics
-- [ ] Document management
+| 서비스 | 개발 | 프로덕션 |
+|--------|------|----------|
+| Frontend | 3000 | - (Vercel) |
+| Backend | 4000 | - (내부) |
+| Nginx | 8080 | 80, 443 |
+| Database | 5435 | 5435 |
 
-## API Documentation
+## 라이선스
 
-API documentation will be available at `http://localhost:3001/api` (Swagger UI) after backend setup.
+Private - All Rights Reserved
 
-## Contributing
+## 문의
 
-1. Create feature branch from `develop`
-2. Follow conventional commits (`feat:`, `fix:`, `refactor:`, etc.)
-3. Submit PR for review
-
-## License
-
-Private - All rights reserved
+준비스튜디오 팀

@@ -1,0 +1,9 @@
+{
+  "buildCommand": "cd ../.. && pnpm build --filter=@joonbi/web",
+  "outputDirectory": ".next",
+  "installCommand": "cd ../.. && pnpm install",
+  "framework": "nextjs",
+  "env": {
+    "NEXT_PUBLIC_API_URL": "https://api.joonbi.co.kr"
+  }
+}
