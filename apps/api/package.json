@@ -42,7 +42,7 @@
     "axios": "^1.6.7",
     "reflect-metadata": "^0.2.1",
     "rxjs": "^7.8.1",
-    "@joonbi/shared": "workspace:*"
+    "@joonbi/shared": "*"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.3.0",
