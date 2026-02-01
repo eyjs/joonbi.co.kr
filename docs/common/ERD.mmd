@@ -1,0 +1,200 @@
+erDiagram
+    %% ==================== 사용자 ====================
+    User {
+        string id PK "UUID"
+        string email UK "이메일"
+        string password "비밀번호"
+        string name "이름"
+        string phone "전화번호"
+        Role role "역할(CUSTOMER/ADMIN)"
+        datetime createdAt "생성일시"
+        datetime updatedAt "수정일시"
+    }
+
+    %% ==================== 상담 ====================
+    Consultation {
+        string id PK "UUID"
+        string userId FK "사용자ID"
+        ConsultationType type "상담유형(SIMPLE/ANALYSIS)"
+        string projectName "프로젝트명"
+        string description "설명"
+        string[] referenceUrls "참고URL"
+        string budgetRange "예산범위"
+        datetime desiredDate "희망날짜"
+        ConsultationStatus status "상태"
+        AnalysisStatus analysisStatus "분석상태"
+        datetime analysisStartedAt "분석시작일시"
+        string analysisError "분석오류"
+        datetime aiAnalyzedAt "AI분석일시"
+        Feasibility aiFeasibility "실현가능성"
+        int aiEstimatedMin "최소견적"
+        int aiEstimatedMax "최대견적"
+        int aiEstimatedDays "예상일수"
+        json aiFeatures "기능목록"
+        string[] aiRisks "위험요소"
+        string aiRejectReason "거절사유"
+        json aiAnalysis "분석결과"
+        datetime createdAt "생성일시"
+        datetime updatedAt "수정일시"
+    }
+
+    ConsultationFile {
+        string id PK "UUID"
+        string consultationId FK "상담ID"
+        string fileType "파일유형"
+        string fileName "파일명"
+        string filePath "파일경로"
+        datetime createdAt "생성일시"
+    }
+
+    ConsultationDesign {
+        string id PK "UUID"
+        string consultationId FK "상담ID"
+        string figmaFileUrl "Figma파일URL"
+        json screens "화면목록"
+        datetime createdAt "생성일시"
+    }
+
+    %% ==================== 프로젝트 ====================
+    Project {
+        string id PK "UUID"
+        string userId FK "사용자ID"
+        string consultationId FK,UK "상담ID"
+        string projectCode UK "프로젝트코드"
+        string projectName "프로젝트명"
+        ProjectStatus status "상태"
+        int totalAmount "총견적"
+        int contractAmount "계약금"
+        int finalAmount "잔금"
+        datetime startDate "시작일"
+        datetime expectedEndDate "예상종료일"
+        datetime actualEndDate "실제종료일"
+        boolean portfolioAgreed "포트폴리오동의"
+        datetime createdAt "생성일시"
+        datetime updatedAt "수정일시"
+    }
+
+    %% ==================== 산출물 ====================
+    Document {
+        string id PK "UUID"
+        string projectId FK "프로젝트ID"
+        string docCode "문서코드"
+        DocumentType docType "문서유형"
+        string docName "문서명"
+        DocumentStatus status "상태"
+        int weight "가중치(%)"
+        string filePath "파일경로"
+        datetime reviewDeadline "검토마감일"
+        int feedbackItemCount "피드백수"
+        int feedbackLimit "피드백한도"
+        datetime createdAt "생성일시"
+        datetime updatedAt "수정일시"
+    }
+
+    DocumentFeedback {
+        string id PK "UUID"
+        string documentId FK "문서ID"
+        string content "내용"
+        FeedbackType type "유형"
+        boolean isNewFeature "신규기능여부"
+        int extraCost "추가비용"
+        FeedbackStatus status "상태"
+        string response "관리자응답"
+        datetime createdAt "생성일시"
+        datetime updatedAt "수정일시"
+    }
+
+    %% ==================== 결제 ====================
+    Payment {
+        string id PK "UUID"
+        string userId FK "사용자ID"
+        string projectId FK "프로젝트ID"
+        PaymentType paymentType "결제유형"
+        int amount "금액"
+        string pgProvider "PG사"
+        string pgTid "거래ID"
+        PaymentStatus status "상태"
+        datetime paidAt "결제일시"
+        datetime createdAt "생성일시"
+        datetime updatedAt "수정일시"
+    }
+
+    %% ==================== 메시지 ====================
+    Message {
+        string id PK "UUID"
+        string projectId FK "프로젝트ID"
+        string senderId "발신자ID"
+        string content "내용"
+        boolean isRead "읽음여부"
+        datetime createdAt "생성일시"
+    }
+
+    %% ==================== 알림 ====================
+    Notification {
+        string id PK "UUID"
+        string userId FK "사용자ID"
+        NotificationType type "알림유형"
+        string title "제목"
+        string content "내용"
+        string link "링크"
+        boolean isRead "읽음여부"
+        datetime createdAt "생성일시"
+    }
+
+    %% ==================== 포트폴리오 ====================
+    Portfolio {
+        string id PK "UUID"
+        string projectId FK,UK "프로젝트ID"
+        string title "제목"
+        string slug UK "슬러그"
+        string description "설명"
+        string thumbnailUrl "썸네일URL"
+        PortfolioDisplay displayType "공개유형"
+        boolean isPublic "공개여부"
+        datetime createdAt "생성일시"
+        datetime updatedAt "수정일시"
+    }
+
+    PortfolioImage {
+        string id PK "UUID"
+        string portfolioId FK "포트폴리오ID"
+        string imageUrl "이미지URL"
+        int displayOrder "표시순서"
+        datetime createdAt "생성일시"
+    }
+
+    %% ==================== 이벤트 ====================
+    EventSlot {
+        string id PK "UUID"
+        string eventType "이벤트유형"
+        int totalSlots "전체슬롯"
+        int usedSlots "사용슬롯"
+        boolean isActive "활성화여부"
+        datetime createdAt "생성일시"
+        datetime updatedAt "수정일시"
+    }
+
+    %% ==================== 관계 ====================
+
+    %% User 관계
+    User ||--o{ Consultation : "작성"
+    User ||--o{ Project : "소유"
+    User ||--o{ Payment : "결제"
+    User ||--o{ Notification : "수신"
+
+    %% Consultation 관계
+    Consultation ||--o{ ConsultationFile : "첨부"
+    Consultation ||--o{ ConsultationDesign : "화면설계"
+    Consultation ||--o| Project : "전환"
+
+    %% Project 관계
+    Project ||--o{ Document : "산출"
+    Project ||--o{ Message : "메시지"
+    Project ||--o{ Payment : "결제"
+    Project ||--o| Portfolio : "포트폴리오"
+
+    %% Document 관계
+    Document ||--o{ DocumentFeedback : "피드백"
+
+    %% Portfolio 관계
+    Portfolio ||--o{ PortfolioImage : "이미지"

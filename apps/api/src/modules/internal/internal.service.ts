@@ -98,10 +98,10 @@ export class InternalService {
         aiEstimatedMin: dto.estimatedMin,
         aiEstimatedMax: dto.estimatedMax,
         aiEstimatedDays: dto.estimatedDays,
-        aiFeatures: dto.features,
+        aiFeatures: dto.features as any,
         aiRisks: dto.risks,
         aiRejectReason: dto.rejectReason,
-        aiAnalysis: dto,
+        aiAnalysis: dto as any,
       },
     });
 
@@ -190,7 +190,7 @@ export class InternalService {
       data: {
         consultationId: id,
         figmaFileUrl: dto.figmaFileUrl,
-        screens: dto.screens,
+        screens: dto.screens as any,
       },
     });
 
