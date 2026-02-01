@@ -1,0 +1,34 @@
+services:
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: joonbi
+      POSTGRES_PASSWORD: joonbi123
+      POSTGRES_DB: joonbistudio
+    ports:
+      - '5434:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U joonbi -d joonbistudio']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: ./backend
+    ports:
+      - '3001:3001'
+    environment:
+      DATABASE_URL: postgresql://joonbi:joonbi123@db:5432/joonbistudio
+      JWT_SECRET: joonbi-secret-key-change-in-production
+      NODE_ENV: development
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+
+volumes:
+  postgres_data:
