@@ -1,60 +1,30 @@
-version: '3.8'
+# Joonbi Studio - Production
+# Frontend: Vercel
+# Backend: CloudFlare Tunnel → Docker API (8081)
 
 services:
-  nginx:
-    image: nginx:alpine
-    container_name: joonbi-nginx
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./nginx/ssl:/etc/nginx/ssl:ro
-      - uploads:/data/uploads:ro
-    depends_on:
-      - web
-      - api
-    restart: always
-    networks:
-      - joonbi-network
-
-  web:
-    build:
-      context: ./apps/web
-      dockerfile: Dockerfile
-      args:
-        - NODE_ENV=production
-    container_name: joonbi-web
-    environment:
-      - NODE_ENV=production
-      - NEXT_PUBLIC_API_URL=https://api.joonbi.co.kr
-    restart: always
-    networks:
-      - joonbi-network
-
+  # ==================== Backend API ====================
   api:
     build:
-      context: ./apps/api
-      dockerfile: Dockerfile
-      args:
-        - NODE_ENV=production
+      context: .
+      dockerfile: ./apps/api/Dockerfile
     container_name: joonbi-api
     environment:
       - NODE_ENV=production
-      - DATABASE_URL=postgresql://postgres:${DB_PASSWORD:-password}@db:5432/joonbi
+      - DATABASE_URL=postgresql://admin:vmffpdl2@@db:5432/joonbi
       - UPLOAD_PATH=/data/uploads
-      - GCS_BUCKET=joonbi-studio-archive
-      - GCS_KEY_FILE=/app/gcs-key.json
       - JWT_SECRET=${JWT_SECRET}
       - JWT_EXPIRES_IN=7d
       - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET}
       - JWT_REFRESH_EXPIRES_IN=30d
+      - INTERNAL_API_KEY=${INTERNAL_API_KEY}
+      - DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
+      - RESEND_API_KEY=${RESEND_API_KEY}
+      - EMAIL_FROM=noreply@joonbi.co.kr
       - NICE_CLIENT_ID=${NICE_CLIENT_ID}
       - NICE_CLIENT_SECRET=${NICE_CLIENT_SECRET}
       - NICE_RETURN_URL=https://joonbi.co.kr/api/payments/callback
       - NICE_CANCEL_URL=https://joonbi.co.kr/my/payments/cancel
-      - RESEND_API_KEY=${RESEND_API_KEY}
-      - EMAIL_FROM=noreply@joonbi.co.kr
       - KAKAO_REST_API_KEY=${KAKAO_REST_API_KEY}
       - KAKAO_SENDER_KEY=${KAKAO_SENDER_KEY}
       - FRONTEND_URL=https://joonbi.co.kr
@@ -62,24 +32,33 @@ services:
     volumes:
       - uploads:/data/uploads
       - ./gcs-key.json:/workspace/apps/api/gcs-key.json:ro
+    ports:
+      - "8081:4000"  # CloudFlare Tunnel connects to localhost:8081
     depends_on:
-      - db
-    restart: always
+      db:
+        condition: service_healthy
+    restart: unless-stopped
     networks:
       - joonbi-network
 
+  # ==================== Database ====================
   db:
     image: postgres:15-alpine
     container_name: joonbi-db
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=${DB_PASSWORD:-password}
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=vmffpdl2@
       - POSTGRES_DB=joonbi
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
-      - "5435:5432"
-    restart: always
+      - "5435:5432"  # External access for DBeaver, etc.
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres -d joonbi']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
     networks:
       - joonbi-network
 

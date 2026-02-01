@@ -15,8 +15,8 @@ AI 자동화로 분석부터 화면설계까지 30분 내 완료.
 |------|------|
 | **Frontend** | Next.js 14, TypeScript, Tailwind CSS |
 | **Backend** | NestJS 10, Prisma, PostgreSQL 15 |
-| **Infrastructure** | Docker, Docker Compose, Nginx |
-| **Deployment** | Frontend (Vercel), Backend (Docker) |
+| **Infrastructure** | Docker, Docker Compose, CloudFlare Tunnel |
+| **Deployment** | Frontend (Vercel), Backend (Docker + CloudFlare Tunnel) |
 | **Automation** | Discord Webhook, Clawdbot |
 
 ## 프로젝트 구조
@@ -24,8 +24,8 @@ AI 자동화로 분석부터 화면설계까지 30분 내 완료.
 ```
 joonbistudio/
 ├── apps/
-│   ├── web/              # Next.js Frontend
-│   └── api/              # NestJS Backend
+│   ├── web/              # Next.js Frontend (Vercel)
+│   └── api/              # NestJS Backend (Docker)
 ├── packages/
 │   └── shared/           # 공유 타입/유틸
 ├── docs/                 # 문서
@@ -34,7 +34,6 @@ joonbistudio/
 │   ├── 03_인프라설계서.md
 │   ├── guides/          # 가이드 문서
 │   └── progress/        # 진행 상황
-├── nginx/               # Nginx 설정
 └── docker-compose.yml   # Docker 설정
 ```
 
@@ -60,26 +59,38 @@ cd apps/web && pnpm install && pnpm dev
 
 ### 3. 접속
 
-- **Frontend**: http://localhost:3000
-- **Backend**: http://localhost:4000
-- **API Docs**: http://localhost:4000/api/docs
+- **Frontend (Vercel)**: https://joonbi.co.kr
+- **Backend (Local)**: http://localhost:8081
+- **Backend (Public)**: https://api.joonbi.co.kr (via CloudFlare Tunnel)
+- **API Docs**: http://localhost:8081/api/docs
 - **Database**: localhost:5435
 
 ## 배포
 
 ### Frontend (Vercel)
 
-1. GitHub 레포지토리 연결
+1. GitHub 레포지토리 연결: https://github.com/eyjs/joonbi.co.kr
 2. Vercel Dashboard 설정:
    - Root Directory: `apps/web`
    - Framework: Next.js
+   - Build Command: `pnpm build`
    - Environment Variables 설정
 
-### Backend (Docker)
+### Backend (Docker + CloudFlare Tunnel)
 
 ```bash
+# 1. Docker 컨테이너 실행
 docker-compose up -d
+
+# 2. CloudFlare Tunnel 설정
+# CloudFlare Dashboard에서 Tunnel 생성
+# api.joonbi.co.kr → http://localhost:8081
 ```
+
+**Architecture:**
+- Frontend: Vercel (joonbi.co.kr)
+- Backend: CloudFlare Tunnel → localhost:8081 → Docker API Container
+- Database: Docker PostgreSQL on port 5435
 
 ## 주요 기능
 
@@ -110,12 +121,11 @@ docker-compose up -d
 
 ## 포트 설정
 
-| 서비스 | 개발 | 프로덕션 |
-|--------|------|----------|
-| Frontend | 3000 | - (Vercel) |
-| Backend | 4000 | - (내부) |
-| Nginx | 8080 | 80, 443 |
-| Database | 5435 | 5435 |
+| 서비스 | 로컬 포트 | 공개 주소 |
+|--------|----------|-----------|
+| Frontend | - | https://joonbi.co.kr (Vercel) |
+| Backend API | 8081 | https://api.joonbi.co.kr (CloudFlare Tunnel) |
+| Database | 5435 | localhost only |
 
 ## 라이선스
 
