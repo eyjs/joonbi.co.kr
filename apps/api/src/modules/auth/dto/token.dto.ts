@@ -1,24 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class TokenResponseDto {
-  @ApiProperty({
-    description: 'Access Token (유효기간: 7일)',
-    example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
-  })
-  accessToken: string;
-
-  @ApiProperty({
-    description: 'Refresh Token (유효기간: 30일)',
-    example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
-  })
-  refreshToken: string;
-
-  @ApiProperty({
-    description: '사용자 정보',
-  })
-  user: UserPayloadDto;
-}
-
 export class UserPayloadDto {
   @ApiProperty({
     description: '사용자 ID',
@@ -44,6 +25,26 @@ export class UserPayloadDto {
     enum: ['CUSTOMER', 'ADMIN'],
   })
   role: string;
+}
+
+export class TokenResponseDto {
+  @ApiProperty({
+    description: 'Access Token (유효기간: 7일)',
+    example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+  })
+  accessToken: string;
+
+  @ApiProperty({
+    description: 'Refresh Token (유효기간: 30일)',
+    example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+  })
+  refreshToken: string;
+
+  @ApiProperty({
+    description: '사용자 정보',
+    type: () => UserPayloadDto,
+  })
+  user: UserPayloadDto;
 }
 
 export class RefreshTokenDto {

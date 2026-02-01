@@ -1,22 +1,27 @@
 FROM node:20-alpine
 
-WORKDIR /workspace
+WORKDIR /app
 
-RUN corepack enable pnpm
+# 기본 도구 설치 (필요시)
+RUN apk add --no-cache libc6-compat
 
-# Copy workspace files
-COPY pnpm-workspace.yaml package.json pnpm-lock.yaml* ./
-COPY packages ./packages
-COPY apps/api ./apps/api
+# 루트 설정 및 의존성 복사
+COPY package.json package-lock.json* ./
+COPY apps/api/package.json ./apps/api/
+COPY packages/shared/package.json ./packages/shared/
 
-# Install dependencies
-RUN pnpm install
+# 의존성 설치
+RUN npm install
 
-WORKDIR /workspace/apps/api
+# 소스 코드 복사
+COPY . .
 
-# Generate Prisma client
-RUN npx prisma generate
+# Prisma 클라이언트 생성
+RUN npx prisma generate --schema=./apps/api/prisma/schema.prisma
+
+WORKDIR /app/apps/api
 
 EXPOSE 4000
 
-CMD ["sh", "-c", "pnpm install && npx prisma generate && pnpm run start:dev"]
+# 개발 서버 시작
+CMD ["npm", "run", "start:dev"]

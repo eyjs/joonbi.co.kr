@@ -11,7 +11,7 @@ services:
     container_name: joonbi-api-dev
     environment:
       - NODE_ENV=development
-      - DATABASE_URL=postgresql://admin:vmffpdl2@@db:5432/joonbi_dev
+      - DATABASE_URL=postgresql://admin:vmffpdl2%40@db:5432/joonbi_dev
       - JWT_SECRET=dev-jwt-secret-at-least-32-chars
       - JWT_REFRESH_SECRET=dev-refresh-secret-at-least-32-chars
       - FRONTEND_URL=https://joonbi.co.kr
