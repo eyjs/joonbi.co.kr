@@ -68,7 +68,7 @@ volumes:
     driver_opts:
       type: none
       o: bind
-      device: /data/joonbi/uploads
+      device: ./uploads
   postgres_data:
 
 networks:

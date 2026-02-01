@@ -5,7 +5,7 @@ services:
   api:
     build:
       context: .
-      dockerfile: ./apps/api/Dockerfile.dev
+      dockerfile: apps/api/Dockerfile.dev
       args:
         - NODE_ENV=development
     container_name: joonbi-api-dev

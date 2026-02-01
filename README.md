@@ -53,8 +53,9 @@ cp .env.example .env
 docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d
 
 # 또는 개별 실행
-cd apps/api && pnpm install && pnpm dev
-cd apps/web && pnpm install && pnpm dev
+npm install
+npm run dev --workspace=@joonbi/api  # Backend만
+npm run dev --workspace=@joonbi/web  # Frontend만
 ```
 
 ### 3. 접속
@@ -73,7 +74,7 @@ cd apps/web && pnpm install && pnpm dev
 2. Vercel Dashboard 설정:
    - Root Directory: `apps/web`
    - Framework: Next.js
-   - Build Command: `pnpm build`
+   - Build Command: `npm run build`
    - Environment Variables 설정
 
 ### Backend (Docker + CloudFlare Tunnel)

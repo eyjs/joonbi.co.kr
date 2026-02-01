@@ -8,12 +8,13 @@
 
 | Layer | Technology |
 |-------|------------|
-| Backend | NestJS 10.x, TypeScript, TypeORM |
-| Frontend | Next.js 16.x (App Router), Tailwind CSS |
+| Backend | NestJS 10.x, TypeScript, Prisma |
+| Frontend | Next.js 14.x (App Router), Tailwind CSS |
 | Database | PostgreSQL 15+ |
 | Auth | JWT + Passport |
 | API Docs | Swagger/OpenAPI |
 | Container | Docker, Docker Compose |
+| Package Manager | npm workspaces |
 
 ## Project Structure
 
@@ -61,14 +62,18 @@ joonbistudio/
 ## Quick Start
 
 ```bash
-# 1. DB 실행
+# 1. 의존성 설치
+npm install
+
+# 2. DB 실행
 docker-compose up -d db
 
-# 2. Backend
-cd backend && npm run start:dev
+# 3. Backend & Frontend 개발 모드
+npm run dev  # 모든 워크스페이스 실행
 
-# 3. Frontend
-cd frontend && npm run dev
+# 또는 개별 실행
+npm run dev --workspace=@joonbi/api
+npm run dev --workspace=@joonbi/web
 ```
 
 ## Coding Rules
