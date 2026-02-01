@@ -27,16 +27,10 @@ export class ProjectResponseDto {
   projectCode: string;
 
   @ApiProperty({
-    description: '프로젝트 제목',
+    description: '프로젝트 이름',
     example: '쇼핑몰 웹사이트 개발',
   })
-  title: string;
-
-  @ApiPropertyOptional({
-    description: '프로젝트 설명',
-    example: '반응형 쇼핑몰 웹사이트 개발',
-  })
-  description?: string;
+  projectName: string;
 
   @ApiProperty({
     description: '프로젝트 상태',
@@ -44,12 +38,6 @@ export class ProjectResponseDto {
     example: 'IN_PROGRESS',
   })
   status: ProjectStatus;
-
-  @ApiProperty({
-    description: '진행률 (%)',
-    example: 45,
-  })
-  progress: number;
 
   @ApiProperty({
     description: '총 금액 (원)',
@@ -69,14 +57,8 @@ export class ProjectResponseDto {
   })
   finalAmount?: number;
 
-  @ApiProperty({
-    description: '선택 문서 금액 (원)',
-    example: 0,
-  })
-  optionalDocsAmount: number;
-
   @ApiPropertyOptional({
-    description: '시작 예정일',
+    description: '시작일',
     example: '2026-03-01T00:00:00Z',
   })
   startDate?: Date;
@@ -85,37 +67,19 @@ export class ProjectResponseDto {
     description: '완료 예정일',
     example: '2026-06-01T00:00:00Z',
   })
-  dueDate?: Date;
+  expectedEndDate?: Date;
 
   @ApiPropertyOptional({
-    description: '완료일',
+    description: '실제 완료일',
     example: '2026-05-30T00:00:00Z',
   })
-  completedDate?: Date;
+  actualEndDate?: Date;
 
   @ApiProperty({
     description: '포트폴리오 동의 여부',
     example: true,
   })
   portfolioAgreed: boolean;
-
-  @ApiPropertyOptional({
-    description: '포트폴리오 타입',
-    example: 'FULL',
-  })
-  portfolioType?: string;
-
-  @ApiPropertyOptional({
-    description: 'A/S 시작일',
-    example: '2026-06-01T00:00:00Z',
-  })
-  asStartDate?: Date;
-
-  @ApiPropertyOptional({
-    description: 'A/S 종료일',
-    example: '2026-12-01T00:00:00Z',
-  })
-  asEndDate?: Date;
 
   @ApiProperty({
     description: '생성일',

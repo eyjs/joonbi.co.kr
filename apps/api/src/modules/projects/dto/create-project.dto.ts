@@ -19,20 +19,12 @@ export class CreateProjectDto {
   userId: string;
 
   @ApiProperty({
-    description: '프로젝트 제목',
+    description: '프로젝트 이름',
     example: '쇼핑몰 웹사이트 개발',
   })
   @IsNotEmpty()
   @IsString()
   title: string;
-
-  @ApiPropertyOptional({
-    description: '프로젝트 설명',
-    example: '반응형 쇼핑몰 웹사이트 개발',
-  })
-  @IsOptional()
-  @IsString()
-  description?: string;
 
   @ApiProperty({
     description: '총 금액 (원)',
@@ -82,28 +74,4 @@ export class CreateProjectDto {
   @IsOptional()
   @IsBoolean()
   portfolioAgreed?: boolean;
-
-  @ApiPropertyOptional({
-    description: '포트폴리오 타입 (전체공개/부분공개/비공개)',
-    example: 'FULL',
-  })
-  @IsOptional()
-  @IsString()
-  portfolioType?: string;
-
-  @ApiPropertyOptional({
-    description: 'A/S 시작일 (완료 후)',
-    example: '2026-06-01T00:00:00Z',
-  })
-  @IsOptional()
-  @IsDateString()
-  asStartDate?: string;
-
-  @ApiPropertyOptional({
-    description: 'A/S 종료일',
-    example: '2026-12-01T00:00:00Z',
-  })
-  @IsOptional()
-  @IsDateString()
-  asEndDate?: string;
 }

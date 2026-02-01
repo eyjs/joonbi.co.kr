@@ -27,19 +27,14 @@ export class ProjectsService {
         userId: dto.userId,
         consultationId: dto.consultationId,
         projectCode,
-        title: dto.title,
-        description: dto.description,
+        projectName: dto.title,
         totalAmount: dto.totalAmount,
         contractAmount,
         finalAmount,
         startDate: dto.startDate ? new Date(dto.startDate) : undefined,
-        dueDate: dto.dueDate ? new Date(dto.dueDate) : undefined,
+        expectedEndDate: dto.dueDate ? new Date(dto.dueDate) : undefined,
         portfolioAgreed: dto.portfolioAgreed ?? false,
-        portfolioType: dto.portfolioType,
-        asStartDate: dto.asStartDate ? new Date(dto.asStartDate) : undefined,
-        asEndDate: dto.asEndDate ? new Date(dto.asEndDate) : undefined,
-        status: ProjectStatus.PENDING,
-        progress: 0,
+        status: ProjectStatus.CONTRACT,
       },
     });
 
@@ -48,7 +43,6 @@ export class ProjectsService {
         where: { id: dto.consultationId },
         data: {
           status: 'CONVERTED',
-          projectId: project.id,
         },
       });
     }
@@ -121,20 +115,15 @@ export class ProjectsService {
     return this.prisma.project.update({
       where: { id },
       data: {
-        title: dto.title,
-        description: dto.description,
+        projectName: dto.title,
         status: dto.status,
         totalAmount: dto.totalAmount,
         contractAmount: dto.contractAmount,
         finalAmount: dto.finalAmount,
-        optionalDocsAmount: dto.optionalDocsAmount,
         startDate: dto.startDate ? new Date(dto.startDate) : undefined,
-        dueDate: dto.dueDate ? new Date(dto.dueDate) : undefined,
-        completedDate: dto.completedDate ? new Date(dto.completedDate) : undefined,
+        expectedEndDate: dto.dueDate ? new Date(dto.dueDate) : undefined,
+        actualEndDate: dto.completedDate ? new Date(dto.completedDate) : undefined,
         portfolioAgreed: dto.portfolioAgreed,
-        portfolioType: dto.portfolioType,
-        asStartDate: dto.asStartDate ? new Date(dto.asStartDate) : undefined,
-        asEndDate: dto.asEndDate ? new Date(dto.asEndDate) : undefined,
       },
     });
   }
@@ -144,7 +133,6 @@ export class ProjectsService {
       where: { id },
       include: {
         documents: {
-          where: { docType: 'REQUIRED' },
           orderBy: { weight: 'desc' },
         },
       },
@@ -169,11 +157,6 @@ export class ProjectsService {
     }, 0);
 
     const progress = Math.round((totalProgress / totalWeight) * 100);
-
-    await this.prisma.project.update({
-      where: { id },
-      data: { progress },
-    });
 
     const documents = project.documents.map((doc) => ({
       docCode: doc.docCode,
@@ -204,10 +187,9 @@ export class ProjectsService {
     }
 
     const validTransitions: Record<ProjectStatus, ProjectStatus[]> = {
-      PENDING: ['CONTRACT_WAITING', 'CANCELLED'],
-      CONTRACT_WAITING: ['IN_PROGRESS', 'CANCELLED'],
-      IN_PROGRESS: ['FINAL_WAITING', 'CANCELLED'],
-      FINAL_WAITING: ['COMPLETED', 'CANCELLED'],
+      CONTRACT: ['IN_PROGRESS', 'CANCELLED'],
+      IN_PROGRESS: ['REVIEW', 'CANCELLED'],
+      REVIEW: ['COMPLETED', 'IN_PROGRESS', 'CANCELLED'],
       COMPLETED: [],
       CANCELLED: [],
     };
@@ -226,8 +208,7 @@ export class ProjectsService {
     }
 
     if (status === 'COMPLETED') {
-      updateData.completedDate = new Date();
-      updateData.progress = 100;
+      updateData.actualEndDate = new Date();
     }
 
     return this.prisma.project.update({
