@@ -43,9 +43,9 @@ apps/api/prisma/migrations/
 # Uploads
 uploads/
 
-# Lock files (use pnpm)
-package-lock.json
+# Lock files (keep npm, ignore others)
 yarn.lock
+pnpm-lock.yaml
 
 # Archive (old backups)
 _archive/

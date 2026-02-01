@@ -13,7 +13,6 @@ import { InternalModule } from './modules/internal/internal.module';
 import { PaymentsModule } from './modules/payments/payments.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
 import { EmailsModule } from './modules/emails/emails.module';
-import { MessagesModule } from './modules/messages/messages.module';
 
 @Module({
   imports: [
@@ -34,7 +33,6 @@ import { MessagesModule } from './modules/messages/messages.module';
     PaymentsModule,
     NotificationsModule,
     EmailsModule,
-    MessagesModule,
   ],
 })
 export class AppModule {}
