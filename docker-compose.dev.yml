@@ -18,8 +18,8 @@ services:
 
   web:
     build:
-      context: ./apps/web
-      dockerfile: Dockerfile.dev
+      context: .
+      dockerfile: ./apps/web/Dockerfile.dev
       args:
         - NODE_ENV=development
     container_name: joonbi-web-dev
@@ -27,9 +27,9 @@ services:
       - NODE_ENV=development
       - NEXT_PUBLIC_API_URL=http://localhost/api
     volumes:
-      - ./apps/web:/app
-      - /app/node_modules
-      - /app/.next
+      - ./apps/web:/workspace/apps/web
+      - /workspace/node_modules
+      - /workspace/apps/web/.next
     ports:
       - "3000:3000"
     restart: unless-stopped
@@ -38,8 +38,8 @@ services:
 
   api:
     build:
-      context: ./apps/api
-      dockerfile: Dockerfile.dev
+      context: .
+      dockerfile: ./apps/api/Dockerfile.dev
       args:
         - NODE_ENV=development
     container_name: joonbi-api-dev
@@ -54,9 +54,9 @@ services:
       - FRONTEND_URL=http://localhost
       - BACKEND_URL=http://localhost/api
     volumes:
-      - ./apps/api:/app
-      - /app/node_modules
-      - /app/dist
+      - ./apps/api:/workspace/apps/api
+      - /workspace/node_modules
+      - api-dist:/workspace/apps/api/dist
       - uploads:/data/uploads
     ports:
       - "4000:4000"
@@ -95,6 +95,7 @@ volumes:
       o: bind
       device: ${PWD}/data/uploads
   postgres_data_dev:
+  api-dist:
 
 networks:
   joonbi-network:

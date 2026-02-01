@@ -61,7 +61,7 @@ services:
       - BACKEND_URL=https://api.joonbi.co.kr
     volumes:
       - uploads:/data/uploads
-      - ./gcs-key.json:/app/gcs-key.json:ro
+      - ./gcs-key.json:/workspace/apps/api/gcs-key.json:ro
     depends_on:
       - db
     restart: always
