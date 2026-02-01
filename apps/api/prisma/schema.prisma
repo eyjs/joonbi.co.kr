@@ -1,0 +1,380 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ==================== 사용자 ====================
+
+model User {
+  id            String    @id @default(uuid())
+  email         String    @unique
+  password      String
+  name          String
+  phone         String?
+  role          Role      @default(CUSTOMER)
+
+  consultations Consultation[]
+  projects      Project[]
+  payments      Payment[]
+  notifications Notification[]
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+enum Role {
+  CUSTOMER
+  ADMIN
+}
+
+// ==================== 상담 ====================
+
+model Consultation {
+  id              String             @id @default(uuid())
+  userId          String
+  user            User               @relation(fields: [userId], references: [id])
+
+  // 기본 정보
+  type            ConsultationType
+  projectName     String
+  description     String
+  referenceUrls   String[]
+  budgetRange     String?
+  desiredDate     DateTime?
+
+  // 상태
+  status          ConsultationStatus @default(PENDING)
+
+  // AI 분석 상태
+  analysisStatus  AnalysisStatus     @default(PENDING)
+  analysisStartedAt DateTime?
+  analysisError   String?
+
+  // AI 분석 결과
+  aiAnalyzedAt    DateTime?
+  aiFeasibility   Feasibility?
+  aiEstimatedMin  Int?
+  aiEstimatedMax  Int?
+  aiEstimatedDays Int?
+  aiFeatures      Json?              // 기능 목록
+  aiRisks         String[]
+  aiRejectReason  String?
+  aiAnalysis      Json?              // 전체 분석 결과
+
+  // 관계
+  files           ConsultationFile[]
+  designs         ConsultationDesign[]
+  project         Project?
+
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+}
+
+enum ConsultationType {
+  SIMPLE    // 간편 상담 (무료)
+  ANALYSIS  // 분석 상담 (유료)
+}
+
+enum ConsultationStatus {
+  PENDING     // 대기
+  PROCESSING  // 처리중
+  COMPLETED   // 완료
+  REJECTED    // 거절
+  CONVERTED   // 프로젝트 전환
+}
+
+enum AnalysisStatus {
+  PENDING     // 분석 대기
+  PROCESSING  // 분석 중
+  DONE        // 분석 완료
+  FAILED      // 분석 실패
+  SKIPPED     // 건너뜀 (간편상담)
+}
+
+enum Feasibility {
+  FEASIBLE      // 개발 가능
+  CONDITIONAL   // 조건부 가능
+  INFEASIBLE    // 개발 불가
+}
+
+// 상담 산출물 (자동 생성 문서)
+model ConsultationFile {
+  id              String       @id @default(uuid())
+  consultationId  String
+  consultation    Consultation @relation(fields: [consultationId], references: [id])
+
+  fileType        String       // analysis, requirements, plan, quotation
+  fileName        String
+  filePath        String       // 파일 경로 또는 URL
+
+  createdAt       DateTime     @default(now())
+}
+
+// 화면설계 (Stitch 생성)
+model ConsultationDesign {
+  id              String       @id @default(uuid())
+  consultationId  String
+  consultation    Consultation @relation(fields: [consultationId], references: [id])
+
+  figmaFileUrl    String       // 전체 Figma 파일 링크
+  screens         Json         // 화면별 정보 [{screenId, screenName, figmaUrl}]
+
+  createdAt       DateTime     @default(now())
+}
+
+// ==================== 프로젝트 ====================
+
+model Project {
+  id              String        @id @default(uuid())
+  userId          String
+  user            User          @relation(fields: [userId], references: [id])
+
+  consultationId  String?       @unique
+  consultation    Consultation? @relation(fields: [consultationId], references: [id])
+
+  // 기본 정보
+  projectCode     String        @unique  // PROJ-001
+  projectName     String
+  status          ProjectStatus @default(CONTRACT)
+
+  // 금액
+  totalAmount     Int           // 총 견적
+  contractAmount  Int           // 계약금
+  finalAmount     Int           // 잔금
+
+  // 일정
+  startDate       DateTime?
+  expectedEndDate DateTime?
+  actualEndDate   DateTime?
+
+  // 포트폴리오 동의
+  portfolioAgreed Boolean       @default(false)
+
+  // 관계
+  documents       Document[]
+  messages        Message[]
+  payments        Payment[]
+  portfolio       Portfolio?
+
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+}
+
+enum ProjectStatus {
+  CONTRACT      // 계약 대기
+  IN_PROGRESS   // 진행중
+  REVIEW        // 검수중
+  COMPLETED     // 완료
+  CANCELLED     // 취소
+}
+
+// ==================== 산출물 ====================
+
+model Document {
+  id              String          @id @default(uuid())
+  projectId       String
+  project         Project         @relation(fields: [projectId], references: [id])
+
+  docCode         String          // DOC-01, DOC-02...
+  docType         DocumentType
+  docName         String
+
+  status          DocumentStatus  @default(WAITING)
+  weight          Int             // 가중치 (%)
+
+  filePath        String?
+  reviewDeadline  DateTime?       // 검토 마감일
+
+  feedbackItemCount Int           @default(0)
+  feedbackLimit     Int           @default(5)
+
+  feedbacks       DocumentFeedback[]
+
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+}
+
+enum DocumentType {
+  REQUIREMENTS    // 요구사항명세서
+  SOURCE_CODE     // 소스코드
+  MANUAL          // 운영매뉴얼
+  CREDENTIALS     // 관리자계정정보
+  SCREEN_DESIGN   // 화면설계서 (선택)
+  ERD             // ERD (선택)
+  API_SPEC        // API명세서 (선택)
+  ARCHITECTURE    // 시스템아키텍처 (선택)
+  TEST_RESULT     // 테스트결과서 (선택)
+}
+
+enum DocumentStatus {
+  WAITING         // 대기
+  WORKING         // 작업중
+  REVIEW          // 검토중
+  FEEDBACK        // 피드백
+  APPROVED        // 승인
+  DELIVERED       // 납품완료
+}
+
+// ==================== 피드백 ====================
+
+model DocumentFeedback {
+  id            String        @id @default(uuid())
+  documentId    String
+  document      Document      @relation(fields: [documentId], references: [id])
+
+  content       String
+  type          FeedbackType
+  isNewFeature  Boolean       @default(false)  // 신규 기능 여부
+  extraCost     Int?          // 추가 비용
+
+  status        FeedbackStatus @default(PENDING)
+  response      String?       // 관리자 응답
+
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+}
+
+enum FeedbackType {
+  BUG             // 버그
+  CHANGE          // 수정 요청
+  QUESTION        // 질문
+  NEW_FEATURE     // 신규 기능
+}
+
+enum FeedbackStatus {
+  PENDING         // 대기
+  IN_PROGRESS     // 처리중
+  RESOLVED        // 해결
+  REJECTED        // 거절
+}
+
+// ==================== 결제 ====================
+
+model Payment {
+  id              String        @id @default(uuid())
+  userId          String
+  user            User          @relation(fields: [userId], references: [id])
+  projectId       String?
+  project         Project?      @relation(fields: [projectId], references: [id])
+
+  paymentType     PaymentType
+  amount          Int
+
+  pgProvider      String?       // PortOne
+  pgTid           String?       // 거래 ID
+
+  status          PaymentStatus @default(PENDING)
+  paidAt          DateTime?
+
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+}
+
+enum PaymentType {
+  CONSULTATION    // 상담 비용
+  CONTRACT        // 계약금
+  FINAL           // 잔금
+  EXTRA           // 추가 비용
+}
+
+enum PaymentStatus {
+  PENDING         // 대기
+  COMPLETED       // 완료
+  FAILED          // 실패
+  REFUNDED        // 환불
+}
+
+// ==================== 메시지 ====================
+
+model Message {
+  id              String    @id @default(uuid())
+  projectId       String
+  project         Project   @relation(fields: [projectId], references: [id])
+
+  senderId        String
+  content         String
+  isRead          Boolean   @default(false)
+
+  createdAt       DateTime  @default(now())
+}
+
+// ==================== 알림 ====================
+
+model Notification {
+  id              String           @id @default(uuid())
+  userId          String
+  user            User             @relation(fields: [userId], references: [id])
+
+  type            NotificationType
+  title           String
+  content         String
+  link            String?
+  isRead          Boolean          @default(false)
+
+  createdAt       DateTime         @default(now())
+}
+
+enum NotificationType {
+  CONSULTATION_RESULT    // 상담 결과
+  PAYMENT_REQUEST        // 결제 요청
+  DOCUMENT_UPLOADED      // 산출물 업로드
+  REVIEW_REQUEST         // 검토 요청
+  REVIEW_DEADLINE        // 검토 마감 임박
+  FEEDBACK_REPLIED       // 피드백 답변
+  PROJECT_COMPLETED      // 프로젝트 완료
+  MESSAGE_RECEIVED       // 메시지 수신
+}
+
+// ==================== 포트폴리오 ====================
+
+model Portfolio {
+  id              String           @id @default(uuid())
+  projectId       String           @unique
+  project         Project          @relation(fields: [projectId], references: [id])
+
+  title           String
+  slug            String           @unique
+  description     String?
+  thumbnailUrl    String?
+  displayType     PortfolioDisplay @default(ANONYMOUS)
+  isPublic        Boolean          @default(false)
+
+  images          PortfolioImage[]
+
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+}
+
+enum PortfolioDisplay {
+  FULL            // 전체 공개
+  ANONYMOUS       // 익명 공개
+  PRIVATE         // 비공개
+}
+
+model PortfolioImage {
+  id              String    @id @default(uuid())
+  portfolioId     String
+  portfolio       Portfolio @relation(fields: [portfolioId], references: [id])
+
+  imageUrl        String
+  displayOrder    Int
+
+  createdAt       DateTime  @default(now())
+}
+
+// ==================== 이벤트 ====================
+
+model EventSlot {
+  id              String    @id @default(uuid())
+  eventType       String    // free_consultation
+  totalSlots      Int       @default(10)
+  usedSlots       Int       @default(0)
+  isActive        Boolean   @default(true)
+
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
