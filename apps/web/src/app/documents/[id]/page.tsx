@@ -57,7 +57,7 @@ export default function DocumentReviewPage() {
     const fetchDocument = async () => {
       try {
         setLoading(true);
-        const docData = await api.get<DocumentResponse>(`/documents/${params.id}`);
+        const docData = await api.get<DocumentResponse>(`/api/documents/${params.id}`);
         setDocument(docData);
 
         // Fetch feedbacks for this document
@@ -94,7 +94,7 @@ export default function DocumentReviewPage() {
       };
 
       const newFeedback = await api.post<FeedbackResponse>(
-        `/documents/${params.id}/feedbacks`,
+        `/api/documents/${params.id}/feedbacks`,
         feedbackData
       );
 
@@ -117,7 +117,7 @@ export default function DocumentReviewPage() {
 
     setSubmitting(true);
     try {
-      await api.post(`/documents/${params.id}/approve`, {});
+      await api.post(`/api/documents/${params.id}/approve`, {});
       alert('문서가 승인되었습니다.');
       router.push('/dashboard');
     } catch (err: unknown) {
@@ -148,7 +148,7 @@ export default function DocumentReviewPage() {
         isNewFeature: false,
       };
 
-      await api.post(`/documents/${params.id}/feedbacks`, feedbackData);
+      await api.post(`/api/documents/${params.id}/feedbacks`, feedbackData);
       alert('수정 요청이 완료되었습니다.');
       router.push('/dashboard');
     } catch (err: unknown) {

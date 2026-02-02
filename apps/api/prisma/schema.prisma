@@ -39,6 +39,9 @@ model Consultation {
   userId          String
   user            User               @relation(fields: [userId], references: [id])
 
+  // UUID 기반 접근 토큰 (로그인 없이 상담 결과 확인)
+  accessToken     String?            @unique @default(uuid())
+
   // 기본 정보
   type            ConsultationType
   projectName     String
@@ -136,6 +139,9 @@ model Project {
 
   consultationId  String?       @unique
   consultation    Consultation? @relation(fields: [consultationId], references: [id])
+
+  // UUID 기반 접근 토큰 (로그인 없이 대시보드 접근)
+  accessToken     String?       @unique @default(uuid())
 
   // 기본 정보
   projectCode     String        @unique  // PROJ-001

@@ -103,6 +103,43 @@ export class ProjectsService {
     return project;
   }
 
+  async findByToken(accessToken: string): Promise<Project> {
+    const project = await this.prisma.project.findFirst({
+      where: { accessToken },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+        consultation: true,
+        documents: {
+          orderBy: { createdAt: 'asc' },
+          include: {
+            feedbacks: {
+              orderBy: { createdAt: 'desc' },
+            },
+          },
+        },
+        messages: {
+          orderBy: { createdAt: 'desc' },
+          take: 50,
+        },
+        payments: {
+          orderBy: { createdAt: 'desc' },
+        },
+      },
+    });
+
+    if (!project) {
+      throw new NotFoundException('유효하지 않은 접근 링크입니다');
+    }
+
+    return project;
+  }
+
   async update(id: string, dto: UpdateProjectDto): Promise<Project> {
     const project = await this.prisma.project.findUnique({
       where: { id },

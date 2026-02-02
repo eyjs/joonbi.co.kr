@@ -29,8 +29,8 @@ export default function DashboardPage() {
       try {
         setLoading(true);
         const [projectsData, consultationsData] = await Promise.all([
-          api.get<{ data: ProjectResponse[] }>('/projects?page=1&limit=10'),
-          api.get<ConsultationResponse[]>('/consultations'),
+          api.get<{ data: ProjectResponse[] }>('/api/projects?page=1&limit=10'),
+          api.get<ConsultationResponse[]>('/api/consultations'),
         ]);
 
         setProjects(projectsData.data || []);

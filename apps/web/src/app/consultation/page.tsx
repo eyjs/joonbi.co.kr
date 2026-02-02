@@ -49,7 +49,7 @@ export default function ConsultationPage() {
       };
 
       const response = await api.post<ConsultationResponse>(
-        '/consultations',
+        '/api/consultations',
         consultationData
       );
 

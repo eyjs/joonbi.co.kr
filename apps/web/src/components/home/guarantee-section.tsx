@@ -6,54 +6,54 @@ export function GuaranteeSection() {
       icon: Shield,
       title: '3개월 무상 A/S',
       description: '배포 후 3개월간 버그 수정과 기술 지원을 무료로 제공합니다.',
-      color: 'from-blue-500 to-cyan-500',
-      bgColor: 'from-blue-50 to-cyan-50',
+      color: 'text-deep-teal',
+      borderColor: 'border-deep-teal',
     },
     {
       icon: BookOpen,
       title: '사용 매뉴얼 제공',
       description: '관리자와 사용자를 위한 상세한 사용 매뉴얼을 함께 드립니다.',
-      color: 'from-purple-500 to-pink-500',
-      bgColor: 'from-purple-50 to-pink-50',
+      color: 'text-burnt-orange',
+      borderColor: 'border-burnt-orange',
     },
     {
       icon: FileCode,
       title: '소스코드 전달',
       description: '프로젝트 완료 후 모든 소스코드를 고객에게 이전해 드립니다.',
-      color: 'from-green-500 to-emerald-500',
-      bgColor: 'from-green-50 to-emerald-50',
+      color: 'text-charcoal',
+      borderColor: 'border-charcoal',
     },
   ];
 
   return (
-    <section className="py-20 bg-gradient-to-br from-gray-50 to-blue-50">
+    <section className="py-32 bg-light-tan paper-texture">
       <div className="container mx-auto px-4">
         <div className="max-w-6xl mx-auto">
           {/* 제목 */}
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+          <div className="text-center mb-20">
+            <h2 className="text-display text-4xl md:text-6xl font-bold mb-8">
               완성 후에도 안심하세요
             </h2>
-            <p className="text-xl text-gray-600">
+            <div className="dotted-divider max-w-md mx-auto mb-6"></div>
+            <p className="text-xl text-warm-gray text-korean">
               3가지 보장으로 끝까지 책임집니다
             </p>
           </div>
 
           {/* 보장 항목 */}
-          <div className="grid md:grid-cols-3 gap-8 mb-12">
+          <div className="grid md:grid-cols-3 gap-8 mb-16">
             {guarantees.map((item) => {
               const Icon = item.icon;
               return (
-                <div key={item.title} className="group relative">
-                  <div className={`absolute inset-0 bg-gradient-to-br ${item.color} rounded-2xl blur opacity-0 group-hover:opacity-20 transition`}></div>
-                  <div className={`relative bg-gradient-to-br ${item.bgColor} border-2 border-gray-200 rounded-2xl p-8 hover:shadow-xl transition-all h-full`}>
-                    <div className={`w-20 h-20 bg-gradient-to-br ${item.color} rounded-2xl flex items-center justify-center mb-6 mx-auto`}>
-                      <Icon className="w-10 h-10 text-white" />
+                <div key={item.title} className="scroll-reveal">
+                  <div className={`atelier-card border-2 ${item.borderColor} h-full corner-bracket`}>
+                    <div className={`w-20 h-20 border-2 ${item.borderColor} flex items-center justify-center mb-6 mx-auto`}>
+                      <Icon className={`w-10 h-10 ${item.color}`} />
                     </div>
-                    <h3 className="font-bold text-2xl text-center mb-4">
+                    <h3 className="font-bold text-2xl text-center mb-4 text-display text-charcoal">
                       {item.title}
                     </h3>
-                    <p className="text-gray-600 text-center leading-relaxed">
+                    <p className="text-warm-gray text-center leading-relaxed text-korean">
                       {item.description}
                     </p>
                   </div>
@@ -64,11 +64,12 @@ export function GuaranteeSection() {
 
           {/* 추가 설명 */}
           <div className="text-center">
-            <div className="inline-block bg-white rounded-2xl px-8 py-6 shadow-lg">
-              <p className="text-lg text-gray-700 mb-2">
-                <strong className="text-blue-600">납품이 끝이 아닙니다.</strong>
+            <div className="inline-block atelier-card border-2 border-charcoal">
+              <p className="text-lg text-charcoal mb-3 text-korean">
+                <strong className="text-burnt-orange text-display">납품이 끝이 아닙니다.</strong>
               </p>
-              <p className="text-gray-600">
+              <div className="dotted-divider my-4"></div>
+              <p className="text-warm-gray text-korean">
                 배포 후에도 안정적으로 운영할 수 있도록 지원합니다.
               </p>
             </div>

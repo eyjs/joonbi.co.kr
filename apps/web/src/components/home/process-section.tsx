@@ -6,82 +6,84 @@ export function ProcessSection() {
       icon: Search,
       title: '1. 업무 분석',
       description: '의뢰하신 링크의 구조와 기능을 전문가가 분석.',
-      color: 'from-blue-500 to-cyan-500',
-      bgColor: 'from-blue-50 to-cyan-50',
+      color: 'text-deep-teal',
+      borderColor: 'border-deep-teal',
     },
     {
       icon: Brain,
       title: '2. 자동 기획',
       description: 'AI를 활용해 기획서, 화면 설계서 자동 생성.',
-      color: 'from-purple-500 to-pink-500',
-      bgColor: 'from-purple-50 to-pink-50',
+      color: 'text-burnt-orange',
+      borderColor: 'border-burnt-orange',
     },
     {
       icon: Code2,
       title: '3. 개발 & 테스트',
       description: '최신 AI 코딩 도구로 고속 개발 및 오류 점검.',
-      color: 'from-green-500 to-emerald-500',
-      bgColor: 'from-green-50 to-emerald-50',
+      color: 'text-charcoal',
+      borderColor: 'border-charcoal',
     },
     {
       icon: Rocket,
       title: '4. 배포 & 매뉴얼',
       description: '사이트 오픈 및 영상 매뉴얼 제공.',
-      color: 'from-orange-500 to-red-500',
-      bgColor: 'from-orange-50 to-red-50',
+      color: 'text-accent-red',
+      borderColor: 'border-accent-red',
     },
   ];
 
   return (
-    <section className="py-20 bg-gradient-to-br from-blue-50 to-purple-50">
+    <section className="py-32 bg-white paper-texture relative">
+      <div className="display-number absolute left-1/2 top-16 -translate-x-1/2 pointer-events-none select-none">
+        04
+      </div>
       <div className="container mx-auto px-4">
         <div className="max-w-6xl mx-auto">
           {/* 제목 */}
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+          <div className="text-center mb-20">
+            <h2 className="text-display text-4xl md:text-6xl font-bold mb-8">
               링크만 주시면,<br />나머지는 전문가가 AI와 함께 완성합니다.
             </h2>
+            <div className="dotted-divider max-w-md mx-auto"></div>
           </div>
 
           {/* 프로세스 스텝 */}
-          <div className="grid md:grid-cols-4 gap-8 relative">
+          <div className="grid md:grid-cols-4 gap-8 relative mb-16">
             {/* 연결선 */}
-            <div className="hidden md:block absolute top-24 left-0 right-0 h-1 bg-gradient-to-r from-blue-200 via-purple-200 to-orange-200"></div>
+            <div className="hidden md:block absolute top-24 left-0 right-0">
+              <div className="dotted-divider"></div>
+            </div>
 
-            {steps.map((step) => {
+            {steps.map((step, index) => {
               const Icon = step.icon;
               return (
-                <div key={step.title} className="relative">
-                  <div className="bg-white rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all hover:-translate-y-2">
+                <div key={step.title} className="relative scroll-reveal">
+                  <div className={`atelier-card border-2 ${step.borderColor} h-full`}>
                     {/* 아이콘 */}
-                    <div className={`w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br ${step.color} flex items-center justify-center shadow-lg relative z-10`}>
-                      <Icon className="w-10 h-10 text-white" />
+                    <div className={`w-20 h-20 mx-auto mb-6 border-2 ${step.borderColor} flex items-center justify-center relative z-10 bg-white`}>
+                      <Icon className={`w-10 h-10 ${step.color}`} />
                     </div>
 
                     {/* 제목 */}
-                    <h3 className="text-xl font-bold text-center mb-4">
+                    <h3 className="text-display text-xl font-bold text-center mb-4 text-charcoal">
                       {step.title}
                     </h3>
 
                     {/* 설명 */}
-                    <p className="text-gray-600 text-center text-sm leading-relaxed">
+                    <p className="text-warm-gray text-center text-sm leading-relaxed text-korean">
                       {step.description}
                     </p>
-
-                    {/* 배경 그라디언트 */}
-                    <div className={`absolute inset-0 bg-gradient-to-br ${step.bgColor} rounded-2xl opacity-0 hover:opacity-20 transition-opacity -z-10`}></div>
                   </div>
-
                 </div>
               );
             })}
           </div>
 
           {/* 하단 메시지 */}
-          <div className="mt-16 text-center">
-            <div className="inline-block bg-white rounded-2xl px-8 py-6 shadow-lg">
-              <p className="text-lg text-gray-700 flex items-center gap-2 justify-center">
-                <Zap className="w-5 h-5 text-yellow-500" aria-hidden="true" />
+          <div className="text-center">
+            <div className="inline-block atelier-card border-2 border-charcoal">
+              <p className="text-lg text-charcoal flex items-center gap-3 justify-center text-korean">
+                <Zap className="w-5 h-5 text-burnt-orange" aria-hidden="true" />
                 <strong>평균 개발 기간:</strong> 2~4주 (복잡도에 따라 상이)
               </p>
             </div>

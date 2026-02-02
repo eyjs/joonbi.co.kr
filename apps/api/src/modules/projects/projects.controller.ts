@@ -29,17 +29,33 @@ import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
 import { RolesGuard } from '@/common/guards/roles.guard';
 import { Roles } from '@/common/decorators/roles.decorator';
 import { CurrentUser } from '@/common/decorators/current-user.decorator';
+import { Public } from '@/common/decorators/public.decorator';
 import { Role } from '@prisma/client';
 import { AuthenticatedUser } from '@/common/types';
 
 @ApiTags('projects')
 @Controller('projects')
-@UseGuards(JwtAuthGuard)
-@ApiBearerAuth()
 export class ProjectsController {
   constructor(private readonly projectsService: ProjectsService) {}
 
+  @Get('by-token/:accessToken')
+  @Public()
+  @ApiOperation({ summary: 'accessToken으로 프로젝트 조회 (로그인 불필요)' })
+  @ApiResponse({
+    status: 200,
+    description: '프로젝트 조회 성공',
+    type: ProjectResponseDto,
+  })
+  @ApiResponse({ status: 404, description: '프로젝트를 찾을 수 없습니다' })
+  async findByToken(
+    @Param('accessToken') accessToken: string,
+  ): Promise<ProjectResponseDto> {
+    return this.projectsService.findByToken(accessToken);
+  }
+
   @Get()
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: '내 프로젝트 목록 조회' })
   @ApiResponse({
     status: 200,
@@ -61,6 +77,8 @@ export class ProjectsController {
   }
 
   @Get(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: '프로젝트 상세 조회' })
   @ApiResponse({
     status: 200,

@@ -34,6 +34,7 @@ const config: Config = {
         accent: {
           DEFAULT: 'hsl(var(--accent))',
           foreground: 'hsl(var(--accent-foreground))',
+          red: '#D84315',
         },
         popover: {
           DEFAULT: 'hsl(var(--popover))',
@@ -43,11 +44,21 @@ const config: Config = {
           DEFAULT: 'hsl(var(--card))',
           foreground: 'hsl(var(--card-foreground))',
         },
+        cream: '#FAF8F5',
+        charcoal: '#1A1A1A',
+        'burnt-orange': '#E67E22',
+        'deep-teal': '#2C5F5D',
+        'warm-gray': '#8B7E74',
+        'light-tan': '#E8E3DC',
       },
       borderRadius: {
         lg: 'var(--radius)',
         md: 'calc(var(--radius) - 2px)',
         sm: 'calc(var(--radius) - 4px)',
+      },
+      fontFamily: {
+        display: ['var(--font-display)'],
+        korean: ['var(--font-korean)'],
       },
     },
   },
