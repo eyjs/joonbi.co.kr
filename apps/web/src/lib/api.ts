@@ -1,8 +1,8 @@
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
-export const api = axios.create({
+const axiosInstance = axios.create({
   baseURL: API_URL,
   headers: {
     'Content-Type': 'application/json',
@@ -10,7 +10,7 @@ export const api = axios.create({
   withCredentials: true,
 });
 
-api.interceptors.request.use((config) => {
+axiosInstance.interceptors.request.use((config) => {
   const token = localStorage.getItem('accessToken');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
@@ -18,7 +18,7 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-api.interceptors.response.use(
+axiosInstance.interceptors.response.use(
   (response) => response.data,
   async (error) => {
     const originalRequest = error.config;
@@ -36,7 +36,7 @@ api.interceptors.response.use(
         localStorage.setItem('accessToken', accessToken);
 
         originalRequest.headers.Authorization = `Bearer ${accessToken}`;
-        return api(originalRequest);
+        return axiosInstance(originalRequest);
       } catch (refreshError) {
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
@@ -48,3 +48,12 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+
+// Create a typed API wrapper that unwraps the response
+export const api = {
+  get: <T>(url: string, config?: any): Promise<T> => axiosInstance.get(url, config),
+  post: <T>(url: string, data?: any, config?: any): Promise<T> => axiosInstance.post(url, data, config),
+  put: <T>(url: string, data?: any, config?: any): Promise<T> => axiosInstance.put(url, data, config),
+  patch: <T>(url: string, data?: any, config?: any): Promise<T> => axiosInstance.patch(url, data, config),
+  delete: <T>(url: string, config?: any): Promise<T> => axiosInstance.delete(url, config),
+};
