@@ -49,3 +49,6 @@ pnpm-lock.yaml
 
 # Archive (old backups)
 _archive/
+
+# Playwright MCP cache
+.playwright-mcp/
