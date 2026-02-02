@@ -38,7 +38,7 @@ coverage/
 .turbo
 
 # Prisma
-apps/api/prisma/migrations/
+
 
 # Uploads
 uploads/
