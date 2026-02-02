@@ -9,8 +9,8 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
-
-type ConsultationType = 'SIMPLE' | 'ANALYSIS';
+import { api } from '@/lib/api';
+import type { ConsultationType, CreateConsultationDto, ConsultationResponse } from '@/types/consultation';
 
 export default function ConsultationPage() {
   const router = useRouter();
@@ -33,9 +33,28 @@ export default function ConsultationPage() {
     setError('');
 
     try {
-      // TODO: API 연동
-      alert('상담 신청이 완료되었습니다. (데모)');
-      router.push('/');
+      // Convert comma-separated URLs to array
+      const referenceUrlsArray = formData.referenceUrls
+        .split(',')
+        .map((url) => url.trim())
+        .filter((url) => url.length > 0);
+
+      const consultationData: CreateConsultationDto = {
+        type,
+        projectName: formData.projectName,
+        description: formData.description,
+        referenceUrls: referenceUrlsArray,
+        budgetRange: formData.budgetRange || undefined,
+        desiredDate: formData.desiredDate || undefined,
+      };
+
+      const response = await api.post<ConsultationResponse>(
+        '/consultations',
+        consultationData
+      );
+
+      alert('상담 신청이 완료되었습니다.');
+      router.push('/dashboard');
     } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message);

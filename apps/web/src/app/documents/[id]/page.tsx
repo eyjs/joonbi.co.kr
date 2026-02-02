@@ -9,97 +9,98 @@ import { Label } from '@/components/ui/label';
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
 import { useAuthStore } from '@/stores/auth';
+import { api } from '@/lib/api';
+import type { DocumentResponse, FeedbackResponse, CreateFeedbackDto, FeedbackType } from '@/types/document';
 
-type DocumentStatus = 'PENDING' | 'APPROVED' | 'REJECTED' | 'REVISION_REQUESTED';
-type DocumentType = 'ANALYSIS' | 'SPECIFICATION' | 'PROPOSAL' | 'ESTIMATE';
-
-interface Feedback {
-  id: string;
-  content: string;
-  createdAt: string;
-  author: string;
-}
-
-interface Document {
-  id: string;
-  projectName: string;
-  type: DocumentType;
-  status: DocumentStatus;
-  version: string;
-  createdAt: string;
-  pdfUrl: string;
-  feedbacks: Feedback[];
-}
-
-const documentTypeLabels: Record<DocumentType, string> = {
-  ANALYSIS: '분석서',
-  SPECIFICATION: '명세서',
-  PROPOSAL: '기획서',
-  ESTIMATE: '견적서',
+const documentTypeLabels: Record<string, string> = {
+  REQUIREMENTS: '요구사항명세서',
+  DESIGN: '설계서',
+  SOURCE: '소스코드',
+  TEST: '테스트문서',
+  MANUAL: '매뉴얼',
 };
 
-const statusLabels: Record<DocumentStatus, string> = {
-  PENDING: '검토 대기',
-  APPROVED: '승인 완료',
-  REJECTED: '반려',
-  REVISION_REQUESTED: '수정 요청',
+const statusLabels: Record<string, string> = {
+  WAITING: '대기중',
+  WORKING: '작업중',
+  REVIEW: '검토중',
+  REVISION: '수정중',
+  DELIVERED: '완료',
 };
 
-const statusColors: Record<DocumentStatus, string> = {
-  PENDING: 'bg-yellow-100 text-yellow-700',
-  APPROVED: 'bg-green-100 text-green-700',
-  REJECTED: 'bg-red-100 text-red-700',
-  REVISION_REQUESTED: 'bg-blue-100 text-blue-700',
+const statusColors: Record<string, string> = {
+  WAITING: 'bg-yellow-100 text-yellow-700',
+  WORKING: 'bg-blue-100 text-blue-700',
+  REVIEW: 'bg-purple-100 text-purple-700',
+  REVISION: 'bg-orange-100 text-orange-700',
+  DELIVERED: 'bg-green-100 text-green-700',
 };
 
 export default function DocumentReviewPage() {
   const router = useRouter();
   const params = useParams();
   const { isAuthenticated, user } = useAuthStore();
+  const [document, setDocument] = useState<DocumentResponse | null>(null);
+  const [feedbacks, setFeedbacks] = useState<FeedbackResponse[]>([]);
   const [feedbackContent, setFeedbackContent] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [feedbackType, setFeedbackType] = useState<FeedbackType>('QUESTION');
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
     if (!isAuthenticated) {
       router.push('/login');
+      return;
     }
-  }, [isAuthenticated, router]);
 
-  if (!isAuthenticated) {
+    const fetchDocument = async () => {
+      try {
+        setLoading(true);
+        const docData = await api.get<DocumentResponse>(`/documents/${params.id}`);
+        setDocument(docData);
+
+        // Fetch feedbacks for this document
+        // Note: API might return feedbacks with the document or we fetch separately
+        // For now, we'll initialize empty array
+        setFeedbacks([]);
+      } catch (err: unknown) {
+        console.error('Failed to fetch document:', err);
+        setError('문서를 불러오는데 실패했습니다.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDocument();
+  }, [isAuthenticated, router, params.id]);
+
+  if (!isAuthenticated || loading || !document) {
     return null;
   }
-
-  // TODO: API에서 실제 문서 데이터 가져오기
-  const mockDocument: Document = {
-    id: params.id as string,
-    projectName: '쇼핑몰 웹사이트',
-    type: 'ANALYSIS',
-    status: 'PENDING',
-    version: '1.0',
-    createdAt: '2024-01-20',
-    pdfUrl: '/sample-document.pdf',
-    feedbacks: [
-      {
-        id: '1',
-        content: '전체적인 구성이 좋습니다. 다만 결제 모듈 부분을 좀 더 상세히 설명해주시면 감사하겠습니다.',
-        createdAt: '2024-01-19',
-        author: '홍길동',
-      },
-    ],
-  };
 
   const handleSubmitFeedback = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!feedbackContent.trim()) return;
 
-    setLoading(true);
+    setSubmitting(true);
     setError('');
 
     try {
-      // TODO: API 연동
-      alert('피드백이 등록되었습니다. (데모)');
+      const feedbackData: CreateFeedbackDto = {
+        content: feedbackContent,
+        type: feedbackType,
+        isNewFeature: false,
+      };
+
+      const newFeedback = await api.post<FeedbackResponse>(
+        `/documents/${params.id}/feedbacks`,
+        feedbackData
+      );
+
+      setFeedbacks([...feedbacks, newFeedback]);
       setFeedbackContent('');
+      alert('피드백이 등록되었습니다.');
     } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message);
@@ -107,17 +108,17 @@ export default function DocumentReviewPage() {
         setError('피드백 등록에 실패했습니다.');
       }
     } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
   };
 
   const handleApprove = async () => {
     if (!confirm('이 문서를 승인하시겠습니까?')) return;
 
-    setLoading(true);
+    setSubmitting(true);
     try {
-      // TODO: API 연동
-      alert('문서가 승인되었습니다. (데모)');
+      await api.post(`/documents/${params.id}/approve`, {});
+      alert('문서가 승인되었습니다.');
       router.push('/dashboard');
     } catch (err: unknown) {
       if (err instanceof Error) {
@@ -126,7 +127,7 @@ export default function DocumentReviewPage() {
         setError('승인 처리에 실패했습니다.');
       }
     } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
   };
 
@@ -138,10 +139,17 @@ export default function DocumentReviewPage() {
 
     if (!confirm('수정을 요청하시겠습니까?')) return;
 
-    setLoading(true);
+    setSubmitting(true);
     try {
-      // TODO: API 연동
-      alert('수정 요청이 완료되었습니다. (데모)');
+      // First submit feedback, then document status will change
+      const feedbackData: CreateFeedbackDto = {
+        content: feedbackContent,
+        type: 'IMPROVEMENT',
+        isNewFeature: false,
+      };
+
+      await api.post(`/documents/${params.id}/feedbacks`, feedbackData);
+      alert('수정 요청이 완료되었습니다.');
       router.push('/dashboard');
     } catch (err: unknown) {
       if (err instanceof Error) {
@@ -150,13 +158,18 @@ export default function DocumentReviewPage() {
         setError('수정 요청에 실패했습니다.');
       }
     } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
   };
 
   const handleDownload = () => {
-    // TODO: 실제 파일 다운로드
-    window.open(mockDocument.pdfUrl, '_blank');
+    if (document.filePath) {
+      // Open file in new tab or download
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+      window.open(`${apiUrl}${document.filePath}`, '_blank');
+    } else {
+      alert('파일이 아직 업로드되지 않았습니다.');
+    }
   };
 
   return (
@@ -173,16 +186,16 @@ export default function DocumentReviewPage() {
 
           {/* Page Title */}
           <div className="mb-8">
-            <h1 className="text-3xl font-bold mb-2">{mockDocument.projectName}</h1>
+            <h1 className="text-3xl font-bold mb-2">{document.docName}</h1>
             <div className="flex items-center gap-3">
               <span className="text-muted-foreground">
-                {documentTypeLabels[mockDocument.type]} v{mockDocument.version}
+                {documentTypeLabels[document.docType]} • {document.docCode}
               </span>
-              <span className={`px-3 py-1 rounded-full text-xs font-medium ${statusColors[mockDocument.status]}`}>
-                {statusLabels[mockDocument.status]}
+              <span className={`px-3 py-1 rounded-full text-xs font-medium ${statusColors[document.status]}`}>
+                {statusLabels[document.status]}
               </span>
               <span className="text-muted-foreground text-sm">
-                생성일: {mockDocument.createdAt}
+                생성일: {new Date(document.createdAt).toLocaleDateString()}
               </span>
             </div>
           </div>
@@ -194,26 +207,26 @@ export default function DocumentReviewPage() {
                 <CardHeader>
                   <CardTitle>문서 정보</CardTitle>
                   <CardDescription>
-                    AI가 자동으로 생성한 {documentTypeLabels[mockDocument.type]}입니다
+                    {documentTypeLabels[document.docType]}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-2 gap-4 text-sm">
                     <div>
                       <p className="text-muted-foreground mb-1">문서 유형</p>
-                      <p className="font-medium">{documentTypeLabels[mockDocument.type]}</p>
+                      <p className="font-medium">{documentTypeLabels[document.docType]}</p>
                     </div>
                     <div>
-                      <p className="text-muted-foreground mb-1">버전</p>
-                      <p className="font-medium">v{mockDocument.version}</p>
+                      <p className="text-muted-foreground mb-1">문서 코드</p>
+                      <p className="font-medium">{document.docCode}</p>
                     </div>
                     <div>
                       <p className="text-muted-foreground mb-1">상태</p>
-                      <p className="font-medium">{statusLabels[mockDocument.status]}</p>
+                      <p className="font-medium">{statusLabels[document.status]}</p>
                     </div>
                     <div>
-                      <p className="text-muted-foreground mb-1">생성일</p>
-                      <p className="font-medium">{mockDocument.createdAt}</p>
+                      <p className="text-muted-foreground mb-1">피드백</p>
+                      <p className="font-medium">{document.feedbackItemCount}/{document.feedbackLimit}</p>
                     </div>
                   </div>
 
@@ -286,11 +299,26 @@ export default function DocumentReviewPage() {
                     )}
 
                     <div className="space-y-2">
+                      <Label htmlFor="feedbackType">피드백 유형</Label>
+                      <select
+                        id="feedbackType"
+                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                        value={feedbackType}
+                        onChange={(e) => setFeedbackType(e.target.value as FeedbackType)}
+                      >
+                        <option value="QUESTION">질문</option>
+                        <option value="BUG">버그</option>
+                        <option value="IMPROVEMENT">개선사항</option>
+                        <option value="OTHER">기타</option>
+                      </select>
+                    </div>
+
+                    <div className="space-y-2">
                       <Label htmlFor="feedback">피드백 내용</Label>
                       <textarea
                         id="feedback"
                         className="flex min-h-[120px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                        placeholder="수정이 필요한 부분이나 추가 요청사항을 자유롭게 작성해주세요"
+                        placeholder="수정이 필요한 부분이나 추가 요청사항을 자유롭게 작성해주세요 (최소 10자)"
                         value={feedbackContent}
                         onChange={(e) => setFeedbackContent(e.target.value)}
                       />
@@ -301,7 +329,7 @@ export default function DocumentReviewPage() {
                         type="submit"
                         variant="outline"
                         className="flex-1"
-                        disabled={loading || !feedbackContent.trim()}
+                        disabled={submitting || !feedbackContent.trim() || feedbackContent.length < 10}
                       >
                         피드백 등록
                       </Button>
@@ -310,7 +338,7 @@ export default function DocumentReviewPage() {
                         variant="outline"
                         className="flex-1"
                         onClick={handleRequestRevision}
-                        disabled={loading || !feedbackContent.trim()}
+                        disabled={submitting || !feedbackContent.trim() || feedbackContent.length < 10}
                       >
                         수정 요청
                       </Button>
@@ -320,7 +348,7 @@ export default function DocumentReviewPage() {
                       type="button"
                       className="w-full"
                       onClick={handleApprove}
-                      disabled={loading}
+                      disabled={submitting}
                     >
                       문서 승인하기
                     </Button>
@@ -333,30 +361,59 @@ export default function DocumentReviewPage() {
                 <CardHeader>
                   <CardTitle>피드백 내역</CardTitle>
                   <CardDescription>
-                    {mockDocument.feedbacks.length}개의 피드백
+                    {feedbacks.length}개의 피드백
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  {mockDocument.feedbacks.length === 0 ? (
+                  {feedbacks.length === 0 ? (
                     <p className="text-sm text-muted-foreground text-center py-8">
                       아직 피드백이 없습니다
                     </p>
                   ) : (
                     <div className="space-y-4">
-                      {mockDocument.feedbacks.map((feedback) => (
-                        <div
-                          key={feedback.id}
-                          className="p-4 bg-muted/50 rounded-lg space-y-2"
-                        >
-                          <div className="flex justify-between items-start">
-                            <p className="font-medium text-sm">{feedback.author}</p>
-                            <p className="text-xs text-muted-foreground">
-                              {feedback.createdAt}
-                            </p>
+                      {feedbacks.map((feedback) => {
+                        const feedbackTypeLabels: Record<string, string> = {
+                          BUG: '버그',
+                          IMPROVEMENT: '개선사항',
+                          QUESTION: '질문',
+                          OTHER: '기타',
+                        };
+
+                        return (
+                          <div
+                            key={feedback.id}
+                            className="p-4 bg-muted/50 rounded-lg space-y-2"
+                          >
+                            <div className="flex justify-between items-start">
+                              <div className="flex items-center gap-2">
+                                <span className="px-2 py-0.5 rounded text-xs font-medium bg-primary/10 text-primary">
+                                  {feedbackTypeLabels[feedback.type]}
+                                </span>
+                                {feedback.status && (
+                                  <span className={`px-2 py-0.5 rounded text-xs font-medium ${
+                                    feedback.status === 'RESOLVED' ? 'bg-green-100 text-green-700' :
+                                    feedback.status === 'REJECTED' ? 'bg-red-100 text-red-700' :
+                                    'bg-yellow-100 text-yellow-700'
+                                  }`}>
+                                    {feedback.status === 'RESOLVED' ? '해결됨' :
+                                     feedback.status === 'REJECTED' ? '거절됨' : '대기중'}
+                                  </span>
+                                )}
+                              </div>
+                              <p className="text-xs text-muted-foreground">
+                                {new Date(feedback.createdAt).toLocaleDateString()}
+                              </p>
+                            </div>
+                            <p className="text-sm">{feedback.content}</p>
+                            {feedback.response && (
+                              <div className="mt-2 p-2 bg-background rounded border">
+                                <p className="text-xs font-medium mb-1">관리자 응답:</p>
+                                <p className="text-sm">{feedback.response}</p>
+                              </div>
+                            )}
                           </div>
-                          <p className="text-sm">{feedback.content}</p>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   )}
                 </CardContent>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,41 +8,46 @@ import { Button } from '@/components/ui/button';
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
 import { useAuthStore } from '@/stores/auth';
+import { api } from '@/lib/api';
+import type { ProjectResponse } from '@/types/project';
+import type { ConsultationResponse } from '@/types/consultation';
 
 export default function DashboardPage() {
   const router = useRouter();
   const { isAuthenticated, user } = useAuthStore();
+  const [projects, setProjects] = useState<ProjectResponse[]>([]);
+  const [consultations, setConsultations] = useState<ConsultationResponse[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!isAuthenticated) {
       router.push('/login');
+      return;
     }
+
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const [projectsData, consultationsData] = await Promise.all([
+          api.get<{ data: ProjectResponse[] }>('/projects?page=1&limit=10'),
+          api.get<ConsultationResponse[]>('/consultations'),
+        ]);
+
+        setProjects(projectsData.data || []);
+        setConsultations(consultationsData || []);
+      } catch (err: unknown) {
+        console.error('Failed to fetch dashboard data:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
   }, [isAuthenticated, router]);
 
-  if (!isAuthenticated) {
+  if (!isAuthenticated || loading) {
     return null;
   }
-
-  // TODO: API에서 실제 데이터 가져오기
-  const mockProjects = [
-    {
-      id: '1',
-      projectCode: 'PROJ-001',
-      projectName: '쇼핑몰 웹사이트',
-      status: 'IN_PROGRESS',
-      progress: 65,
-    },
-  ];
-
-  const mockConsultations = [
-    {
-      id: '1',
-      projectName: 'AI 챗봇 시스템',
-      type: 'ANALYSIS',
-      status: 'COMPLETED',
-      createdAt: '2024-01-15',
-    },
-  ];
 
   return (
     <>
@@ -64,19 +69,21 @@ export default function DashboardPage() {
             <Card>
               <CardHeader className="pb-3">
                 <CardDescription>진행중인 프로젝트</CardDescription>
-                <CardTitle className="text-3xl">{mockProjects.length}</CardTitle>
+                <CardTitle className="text-3xl">
+                  {projects.filter(p => p.status === 'IN_PROGRESS').length}
+                </CardTitle>
               </CardHeader>
             </Card>
             <Card>
               <CardHeader className="pb-3">
-                <CardDescription>완료된 상담</CardDescription>
-                <CardTitle className="text-3xl">{mockConsultations.length}</CardTitle>
+                <CardDescription>전체 상담</CardDescription>
+                <CardTitle className="text-3xl">{consultations.length}</CardTitle>
               </CardHeader>
             </Card>
             <Card>
               <CardHeader className="pb-3">
-                <CardDescription>검토 대기중</CardDescription>
-                <CardTitle className="text-3xl">0</CardTitle>
+                <CardDescription>전체 프로젝트</CardDescription>
+                <CardTitle className="text-3xl">{projects.length}</CardTitle>
               </CardHeader>
             </Card>
           </div>
@@ -90,7 +97,7 @@ export default function DashboardPage() {
               </Link>
             </div>
 
-            {mockProjects.length === 0 ? (
+            {projects.length === 0 ? (
               <Card>
                 <CardContent className="flex flex-col items-center justify-center py-12">
                   <svg
@@ -116,50 +123,58 @@ export default function DashboardPage() {
               </Card>
             ) : (
               <div className="grid gap-4">
-                {mockProjects.map((project) => (
-                  <Card
-                    key={project.id}
-                    className="hover:border-primary transition-colors cursor-pointer"
-                  >
-                    <CardHeader>
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <CardTitle>{project.projectName}</CardTitle>
-                          <CardDescription className="mt-1">
-                            {project.projectCode}
-                          </CardDescription>
-                        </div>
-                        <span className="px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
-                          진행중
-                        </span>
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-2">
-                        <div className="flex justify-between text-sm">
-                          <span className="text-muted-foreground">진행률</span>
-                          <span className="font-medium">{project.progress}%</span>
-                        </div>
-                        <div className="w-full bg-secondary rounded-full h-2">
-                          <div
-                            className="bg-primary h-2 rounded-full transition-all"
-                            style={{ width: `${project.progress}%` }}
-                          />
-                        </div>
-                        <div className="flex justify-between items-center mt-4">
-                          <span className="text-sm text-muted-foreground">
-                            다음 마일스톤: 소스코드 검토
+                {projects.map((project) => {
+                  const statusLabels: Record<string, string> = {
+                    PENDING: '대기중',
+                    IN_PROGRESS: '진행중',
+                    REVIEW: '검토중',
+                    COMPLETED: '완료',
+                    CANCELLED: '취소됨',
+                  };
+
+                  const statusColors: Record<string, string> = {
+                    PENDING: 'bg-yellow-100 text-yellow-700',
+                    IN_PROGRESS: 'bg-blue-100 text-blue-700',
+                    REVIEW: 'bg-purple-100 text-purple-700',
+                    COMPLETED: 'bg-green-100 text-green-700',
+                    CANCELLED: 'bg-gray-100 text-gray-700',
+                  };
+
+                  return (
+                    <Card
+                      key={project.id}
+                      className="hover:border-primary transition-colors cursor-pointer"
+                    >
+                      <CardHeader>
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <CardTitle>{project.projectName}</CardTitle>
+                            <CardDescription className="mt-1">
+                              {project.projectCode}
+                            </CardDescription>
+                          </div>
+                          <span className={`px-3 py-1 rounded-full text-xs font-medium ${statusColors[project.status]}`}>
+                            {statusLabels[project.status]}
                           </span>
-                          <Link href={`/projects/${project.id}`}>
-                            <Button variant="outline" size="sm">
-                              자세히 보기
-                            </Button>
-                          </Link>
                         </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-2">
+                          <div className="flex justify-between items-center mt-4">
+                            <span className="text-sm text-muted-foreground">
+                              {project.totalAmount.toLocaleString()}원
+                            </span>
+                            <Link href={`/projects/${project.id}`}>
+                              <Button variant="outline" size="sm">
+                                자세히 보기
+                              </Button>
+                            </Link>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
               </div>
             )}
           </section>
@@ -167,37 +182,66 @@ export default function DashboardPage() {
           {/* Consultations Section */}
           <section>
             <h2 className="text-2xl font-semibold mb-4">상담 내역</h2>
-            <div className="grid gap-4">
-              {mockConsultations.map((consultation) => (
-                <Card key={consultation.id}>
-                  <CardHeader>
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <CardTitle className="text-lg">
-                          {consultation.projectName}
-                        </CardTitle>
-                        <CardDescription>
-                          {consultation.type === 'ANALYSIS'
-                            ? '분석 상담'
-                            : '간편 상담'}{' '}
-                          • {consultation.createdAt}
-                        </CardDescription>
-                      </div>
-                      <span className="px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
-                        완료
-                      </span>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <Link href={`/consultations/${consultation.id}`}>
-                      <Button variant="outline" size="sm">
-                        분석 결과 보기
-                      </Button>
-                    </Link>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+            {consultations.length === 0 ? (
+              <Card>
+                <CardContent className="flex flex-col items-center justify-center py-12">
+                  <p className="text-muted-foreground mb-4">
+                    아직 상담 내역이 없습니다
+                  </p>
+                  <Link href="/consultation">
+                    <Button>새 상담 신청하기</Button>
+                  </Link>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="grid gap-4">
+                {consultations.map((consultation) => {
+                  const statusLabels: Record<string, string> = {
+                    PENDING: '대기중',
+                    ANALYZING: '분석중',
+                    COMPLETED: '완료',
+                    REJECTED: '거절',
+                  };
+
+                  const statusColors: Record<string, string> = {
+                    PENDING: 'bg-yellow-100 text-yellow-700',
+                    ANALYZING: 'bg-blue-100 text-blue-700',
+                    COMPLETED: 'bg-green-100 text-green-700',
+                    REJECTED: 'bg-red-100 text-red-700',
+                  };
+
+                  return (
+                    <Card key={consultation.id}>
+                      <CardHeader>
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <CardTitle className="text-lg">
+                              {consultation.projectName}
+                            </CardTitle>
+                            <CardDescription>
+                              {consultation.type === 'ANALYSIS'
+                                ? '분석 상담'
+                                : '간편 상담'}{' '}
+                              • {new Date(consultation.createdAt).toLocaleDateString()}
+                            </CardDescription>
+                          </div>
+                          <span className={`px-3 py-1 rounded-full text-xs font-medium ${statusColors[consultation.status]}`}>
+                            {statusLabels[consultation.status] || consultation.status}
+                          </span>
+                        </div>
+                      </CardHeader>
+                      <CardContent>
+                        <Link href={`/consultations/${consultation.id}`}>
+                          <Button variant="outline" size="sm">
+                            상세 보기
+                          </Button>
+                        </Link>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
+            )}
           </section>
         </div>
       </div>
