@@ -43,7 +43,7 @@ export class DiscordService {
         `Discord 웹훅 전송 실패: ${error.message}`,
         error.stack,
       );
-      throw error;
+      // Discord 전송 실패는 무시 (상담 생성은 계속 진행)
     }
   }
 
@@ -116,7 +116,7 @@ export class DiscordService {
         `Discord 웹훅 전송 실패: ${error.message}`,
         error.stack,
       );
-      throw error;
+      // Discord 전송 실패는 무시
     }
   }
 
@@ -183,6 +183,7 @@ export class DiscordService {
         `Discord 웹훅 전송 실패: ${error.message}`,
         error.stack,
       );
+      // Discord 전송 실패는 무시
     }
   }
 }
