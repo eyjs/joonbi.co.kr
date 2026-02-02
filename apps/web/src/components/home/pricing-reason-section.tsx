@@ -1,4 +1,4 @@
-import { TrendingDown, Users, Sparkles, Zap } from 'lucide-react';
+import { Users, Sparkles, Zap } from 'lucide-react';
 
 export function PricingReasonSection() {
   return (

@@ -1,4 +1,4 @@
-import { CreditCard, UserPlus, MessageSquare, Search } from 'lucide-react';
+import { CreditCard, UserPlus, MessageSquare, Search, Lightbulb } from 'lucide-react';
 
 export function AddonsSection() {
   const addons = [
@@ -52,10 +52,10 @@ export function AddonsSection() {
 
           {/* 추가 기능 그리드 */}
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {addons.map((addon, index) => {
+            {addons.map((addon) => {
               const Icon = addon.icon;
               return (
-                <div key={index} className="group relative">
+                <div key={addon.title} className="group relative">
                   <div className={`absolute inset-0 bg-gradient-to-br ${addon.color} rounded-2xl blur opacity-0 group-hover:opacity-20 transition`}></div>
                   <div className={`relative bg-gradient-to-br ${addon.bgColor} border-2 border-gray-200 rounded-2xl p-6 hover:shadow-xl transition-all`}>
                     <div className={`w-16 h-16 bg-gradient-to-br ${addon.color} rounded-xl flex items-center justify-center mb-4 mx-auto`}>
@@ -79,9 +79,12 @@ export function AddonsSection() {
           {/* 추가 안내 */}
           <div className="mt-12 text-center">
             <div className="inline-block bg-gray-50 rounded-2xl px-8 py-6 border border-gray-200">
-              <p className="text-gray-700">
-                💡 <strong>맞춤 기능이 필요하신가요?</strong><br />
-                상담 시 자세히 알려주시면 별도 견적을 드립니다.
+              <p className="text-gray-700 flex items-start gap-2">
+                <Lightbulb className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-1" aria-hidden="true" />
+                <span>
+                  <strong>맞춤 기능이 필요하신가요?</strong><br />
+                  상담 시 자세히 알려주시면 별도 견적을 드립니다.
+                </span>
               </p>
             </div>
           </div>

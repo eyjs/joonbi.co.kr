@@ -1,4 +1,4 @@
-import { Search, Brain, Code2, Rocket } from 'lucide-react';
+import { Search, Brain, Code2, Rocket, Zap } from 'lucide-react';
 
 export function ProcessSection() {
   const steps = [
@@ -48,10 +48,10 @@ export function ProcessSection() {
             {/* 연결선 */}
             <div className="hidden md:block absolute top-24 left-0 right-0 h-1 bg-gradient-to-r from-blue-200 via-purple-200 to-orange-200"></div>
 
-            {steps.map((step, index) => {
+            {steps.map((step) => {
               const Icon = step.icon;
               return (
-                <div key={index} className="relative">
+                <div key={step.title} className="relative">
                   <div className="bg-white rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all hover:-translate-y-2">
                     {/* 아이콘 */}
                     <div className={`w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br ${step.color} flex items-center justify-center shadow-lg relative z-10`}>
@@ -72,14 +72,6 @@ export function ProcessSection() {
                     <div className={`absolute inset-0 bg-gradient-to-br ${step.bgColor} rounded-2xl opacity-0 hover:opacity-20 transition-opacity -z-10`}></div>
                   </div>
 
-                  {/* 화살표 (모바일에서만 표시) */}
-                  {index < steps.length - 1 && (
-                    <div className="md:hidden flex justify-center my-4">
-                      <svg className="w-6 h-6 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                      </svg>
-                    </div>
-                  )}
                 </div>
               );
             })}
@@ -88,8 +80,9 @@ export function ProcessSection() {
           {/* 하단 메시지 */}
           <div className="mt-16 text-center">
             <div className="inline-block bg-white rounded-2xl px-8 py-6 shadow-lg">
-              <p className="text-lg text-gray-700">
-                ⚡ <strong>평균 개발 기간:</strong> 2~4주 (복잡도에 따라 상이)
+              <p className="text-lg text-gray-700 flex items-center gap-2 justify-center">
+                <Zap className="w-5 h-5 text-yellow-500" aria-hidden="true" />
+                <strong>평균 개발 기간:</strong> 2~4주 (복잡도에 따라 상이)
               </p>
             </div>
           </div>

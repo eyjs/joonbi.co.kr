@@ -52,16 +52,10 @@ export function WorkflowSection() {
 
           {/* 워크플로우 */}
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {steps.map((step, index) => {
+            {steps.map((step) => {
               const Icon = step.icon;
               return (
-                <div key={index} className="relative">
-                  {/* 연결선 (데스크톱에서만 표시) */}
-                  {index < steps.length - 1 && (
-                    <div className="hidden lg:block absolute top-20 left-full w-full h-1 -ml-3">
-                      <div className={`h-1 w-3/4 bg-gradient-to-r ${step.color} opacity-30`}></div>
-                    </div>
-                  )}
+                <div key={step.number} className="relative">
 
                   <div className="relative z-10">
                     <div className={`bg-gradient-to-br ${step.bgColor} border-2 border-gray-200 rounded-2xl p-6 hover:shadow-xl transition-all h-full`}>

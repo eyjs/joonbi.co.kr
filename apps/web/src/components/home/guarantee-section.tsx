@@ -41,10 +41,10 @@ export function GuaranteeSection() {
 
           {/* 보장 항목 */}
           <div className="grid md:grid-cols-3 gap-8 mb-12">
-            {guarantees.map((item, index) => {
+            {guarantees.map((item) => {
               const Icon = item.icon;
               return (
-                <div key={index} className="group relative">
+                <div key={item.title} className="group relative">
                   <div className={`absolute inset-0 bg-gradient-to-br ${item.color} rounded-2xl blur opacity-0 group-hover:opacity-20 transition`}></div>
                   <div className={`relative bg-gradient-to-br ${item.bgColor} border-2 border-gray-200 rounded-2xl p-8 hover:shadow-xl transition-all h-full`}>
                     <div className={`w-20 h-20 bg-gradient-to-br ${item.color} rounded-2xl flex items-center justify-center mb-6 mx-auto`}>

@@ -47,13 +47,13 @@ export function HeroSection() {
             <div className="bg-white rounded-2xl shadow-2xl p-8 border border-gray-100">
               {/* 브라우저 주소창 모형 */}
               <div className="flex items-center gap-2 mb-6 pb-4 border-b">
-                <div className="flex gap-2">
+                <div className="flex gap-2" aria-hidden="true">
                   <div className="w-3 h-3 rounded-full bg-red-400"></div>
                   <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
                   <div className="w-3 h-3 rounded-full bg-green-400"></div>
                 </div>
                 <div className="flex-1 flex items-center gap-2 bg-gray-100 rounded-lg px-4 py-2">
-                  <LinkIcon className="w-4 h-4 text-gray-400" />
+                  <LinkIcon className="w-4 h-4 text-gray-400" aria-hidden="true" />
                   <span className="text-sm text-gray-500">https://www.example.com</span>
                 </div>
               </div>

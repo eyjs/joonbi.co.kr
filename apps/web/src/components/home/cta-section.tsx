@@ -3,18 +3,19 @@
 import { useState } from 'react';
 import { Link2, Send, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 
 export function CtaSection() {
   const [referenceUrl, setReferenceUrl] = useState('');
+  const router = useRouter();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // 상담 페이지로 이동하면서 URL을 쿼리 파라미터로 전달
     if (referenceUrl.trim()) {
-      window.location.href = `/consultation?reference=${encodeURIComponent(referenceUrl)}`;
+      router.push(`/consultation?reference=${encodeURIComponent(referenceUrl)}`);
     } else {
-      window.location.href = '/consultation';
+      router.push('/consultation');
     }
   };
 
@@ -34,9 +35,11 @@ export function CtaSection() {
           <form onSubmit={handleSubmit} className="mb-8">
             <div className="bg-white rounded-2xl p-3 shadow-2xl flex flex-col md:flex-row gap-3">
               <div className="flex-1 flex items-center gap-3 px-4">
-                <Link2 className="w-6 h-6 text-gray-400 flex-shrink-0" />
+                <Link2 className="w-6 h-6 text-gray-400 flex-shrink-0" aria-hidden="true" />
                 <input
                   type="url"
+                  id="reference-url"
+                  aria-label="참고 사이트 URL"
                   value={referenceUrl}
                   onChange={(e) => setReferenceUrl(e.target.value)}
                   placeholder="참고하고 싶은 사이트 URL을 입력하세요 (선택사항)"

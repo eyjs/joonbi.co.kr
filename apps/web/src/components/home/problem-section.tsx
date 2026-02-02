@@ -1,4 +1,4 @@
-import { MessageSquareX, FileX, Code } from 'lucide-react';
+import { MessageSquareX, FileX, Code, HelpCircle, XCircle, Heart } from 'lucide-react';
 
 export function ProblemSection() {
   return (
@@ -19,7 +19,9 @@ export function ProblemSection() {
             {/* 왼쪽: 고민하는 사업자 */}
             <div className="relative">
               <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-3xl p-12 text-center">
-                <div className="text-8xl mb-6">🤔</div>
+                <div className="w-32 h-32 mb-6 mx-auto bg-gray-200 rounded-full flex items-center justify-center">
+                  <HelpCircle className="w-20 h-20 text-gray-500" aria-hidden="true" />
+                </div>
                 <div className="space-y-4">
                   <div className="bg-white rounded-2xl p-4 shadow-sm flex items-start gap-3">
                     <Code className="w-6 h-6 text-gray-400 flex-shrink-0 mt-1" />
@@ -54,7 +56,7 @@ export function ProblemSection() {
 
               <div className="space-y-4">
                 <div className="flex items-start gap-4 bg-red-50 border border-red-200 rounded-xl p-5">
-                  <div className="text-2xl flex-shrink-0">❌</div>
+                  <XCircle className="w-6 h-6 text-red-500 flex-shrink-0 mt-1" aria-hidden="true" />
                   <div>
                     <div className="font-semibold text-red-700 mb-1">
                       "기획서는 준비되셨나요?"
@@ -66,7 +68,7 @@ export function ProblemSection() {
                 </div>
 
                 <div className="flex items-start gap-4 bg-red-50 border border-red-200 rounded-xl p-5">
-                  <div className="text-2xl flex-shrink-0">❌</div>
+                  <XCircle className="w-6 h-6 text-red-500 flex-shrink-0 mt-1" aria-hidden="true" />
                   <div>
                     <div className="font-semibold text-red-700 mb-1">
                       "개발 용어는 아시죠?"
@@ -78,7 +80,7 @@ export function ProblemSection() {
                 </div>
 
                 <div className="flex items-start gap-4 bg-red-50 border border-red-200 rounded-xl p-5">
-                  <div className="text-2xl flex-shrink-0">❌</div>
+                  <XCircle className="w-6 h-6 text-red-500 flex-shrink-0 mt-1" aria-hidden="true" />
                   <div>
                     <div className="font-semibold text-red-700 mb-1">
                       "디자인 시안을 먼저 보내주세요."
@@ -93,7 +95,7 @@ export function ProblemSection() {
               {/* 하이라이트 메시지 */}
               <div className="bg-blue-50 border-2 border-blue-200 rounded-2xl p-6 mt-8">
                 <div className="flex items-start gap-3">
-                  <div className="text-2xl">💙</div>
+                  <Heart className="w-6 h-6 text-blue-600 flex-shrink-0 mt-1" aria-hidden="true" />
                   <div>
                     <p className="text-blue-900 leading-relaxed">
                       <strong>머릿속엔 아이디어가 있지만,</strong>

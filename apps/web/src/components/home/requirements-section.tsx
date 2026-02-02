@@ -1,4 +1,4 @@
-import { Link as LinkIcon, FileText } from 'lucide-react';
+import { Link as LinkIcon, FileText, Lightbulb } from 'lucide-react';
 
 export function RequirementsSection() {
   return (
@@ -28,9 +28,10 @@ export function RequirementsSection() {
                   <p className="text-orange-900 text-lg font-medium text-center mb-4">
                     "이 사이트처럼 만들어주세요."
                   </p>
-                  <div className="bg-orange-50 rounded-lg p-4 border border-orange-200">
-                    <p className="text-sm text-orange-700 text-center">
-                      💡 예시: https://example.com
+                  <div className="bg-orange-50 rounded-lg p-4 border border-orange-200 flex items-center gap-2 justify-center">
+                    <Lightbulb className="w-4 h-4 text-orange-600 flex-shrink-0" aria-hidden="true" />
+                    <p className="text-sm text-orange-700">
+                      예시: https://example.com
                     </p>
                   </div>
                 </div>
@@ -51,9 +52,10 @@ export function RequirementsSection() {
                   <p className="text-blue-900 text-lg font-medium text-center mb-4">
                     "우리 회사 로고와 색상은 이걸로 하고, 메뉴는 이렇게 구성하고 싶어요."
                   </p>
-                  <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
-                    <p className="text-sm text-blue-700 text-center">
-                      💡 간단한 설명만으로 OK!
+                  <div className="bg-blue-50 rounded-lg p-4 border border-blue-200 flex items-center gap-2 justify-center">
+                    <Lightbulb className="w-4 h-4 text-blue-600 flex-shrink-0" aria-hidden="true" />
+                    <p className="text-sm text-blue-700">
+                      간단한 설명만으로 OK!
                     </p>
                   </div>
                 </div>

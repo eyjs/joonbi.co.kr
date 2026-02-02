@@ -1,4 +1,4 @@
-import { DollarSign, Clock, BookOpen, CheckCircle2, XCircle } from 'lucide-react';
+import { DollarSign, Clock, BookOpen, CheckCircle2 } from 'lucide-react';
 
 export function ComparisonSection() {
   return (

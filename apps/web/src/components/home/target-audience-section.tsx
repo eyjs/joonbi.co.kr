@@ -34,9 +34,9 @@ export function TargetAudienceSection() {
                 <h3 className="text-2xl font-bold">이런 분들께 강력 추천합니다</h3>
               </div>
               <div className="space-y-4">
-                {recommended.map((item, index) => (
-                  <div key={index} className="bg-white rounded-xl p-6 shadow-lg flex items-start gap-4">
-                    <CheckCircle2 className="w-6 h-6 text-green-500 flex-shrink-0 mt-1" />
+                {recommended.map((item) => (
+                  <div key={item} className="bg-white rounded-xl p-6 shadow-lg flex items-start gap-4">
+                    <CheckCircle2 className="w-6 h-6 text-green-500 flex-shrink-0 mt-1" aria-hidden="true" />
                     <p className="text-gray-700">{item}</p>
                   </div>
                 ))}
@@ -50,9 +50,9 @@ export function TargetAudienceSection() {
                 <h3 className="text-2xl font-bold">이런 분께는 정중히 사양합니다</h3>
               </div>
               <div className="space-y-4">
-                {notRecommended.map((item, index) => (
-                  <div key={index} className="bg-white rounded-xl p-6 shadow-lg flex items-start gap-4">
-                    <XCircle className="w-6 h-6 text-red-500 flex-shrink-0 mt-1" />
+                {notRecommended.map((item) => (
+                  <div key={item} className="bg-white rounded-xl p-6 shadow-lg flex items-start gap-4">
+                    <XCircle className="w-6 h-6 text-red-500 flex-shrink-0 mt-1" aria-hidden="true" />
                     <p className="text-gray-700">{item}</p>
                   </div>
                 ))}
