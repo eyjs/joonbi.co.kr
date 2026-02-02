@@ -1,93 +1,52 @@
-import { Users, Sparkles, Zap } from 'lucide-react';
-
 export function PricingReasonSection() {
   return (
-    <section className="py-32 bg-white paper-texture relative">
-      <div className="display-number absolute right-8 bottom-16 pointer-events-none select-none">
-        -60%
-      </div>
-      <div className="container mx-auto px-4">
-        <div className="max-w-6xl mx-auto">
-          {/* 제목 */}
-          <div className="text-center mb-20">
-            <h2 className="text-display text-4xl md:text-6xl font-bold mb-8">
-              에이전시 대비 <span className="text-accent-red">40~60%</span> 저렴한 이유
-            </h2>
-            <div className="dotted-divider max-w-md mx-auto"></div>
+    <section className="swiss-section">
+      <div className="swiss-container">
+        <div className="swiss-grid">
+          <div className="swiss-col-12">
+            <p className="swiss-caption mb-4">07 PRICING REASON</p>
+            <h2 className="swiss-heading-lg mb-12">에이전시 대비 40~60% 저렴한 이유</h2>
           </div>
 
-          {/* 비교 차트 */}
-          <div className="grid md:grid-cols-2 gap-16 mb-20 items-end">
-            {/* 일반 에이전시 */}
-            <div className="scroll-reveal">
-              <h3 className="text-display text-2xl font-bold text-center mb-10 text-charcoal">일반 에이전시</h3>
-              <div className="relative h-96 bg-light-tan border-2 border-light-tan p-6 flex flex-col justify-end">
-                <div className="space-y-3">
-                  <div className="bg-white border border-warm-gray p-4 text-center font-semibold text-korean text-charcoal">
-                    영업 수수료
-                  </div>
-                  <div className="bg-white border border-warm-gray p-4 text-center font-semibold text-korean text-charcoal">
-                    PM 인건비
-                  </div>
-                  <div className="bg-white border border-warm-gray p-4 text-center font-semibold text-korean text-charcoal">
-                    사무실 임대료
-                  </div>
-                  <div className="bg-accent-red text-cream border-2 border-accent-red p-6 text-center font-bold text-lg text-korean">
-                    개발비
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* 준비스튜디오 */}
-            <div className="scroll-reveal">
-              <h3 className="text-display text-2xl font-bold text-center mb-10 text-charcoal">Joonbi Studio</h3>
-              <div className="relative h-96 bg-light-tan border-2 border-light-tan p-6 flex flex-col justify-end">
-                {/* -60% 표시 */}
-                <div className="absolute top-6 left-1/2 -translate-x-1/2 bg-burnt-orange text-cream text-4xl font-bold px-10 py-5 text-display border-2 border-burnt-orange">
-                  -60%
-                </div>
-
-                <div className="space-y-3 mt-auto">
-                  <div className="bg-charcoal text-cream border-2 border-charcoal p-12 text-center font-bold text-2xl text-display">
-                    개발비
-                  </div>
-                </div>
-              </div>
-            </div>
+          <div className="swiss-col-6">
+            <h3 className="swiss-heading-md mb-6">일반 에이전시</h3>
+            <ul className="swiss-list mb-8">
+              <li>영업 수수료</li>
+              <li>PM 인건비</li>
+              <li>사무실 임대료</li>
+              <li>개발비</li>
+            </ul>
           </div>
 
-          {/* 3가지 이유 */}
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="atelier-card border-2 border-deep-teal scroll-reveal corner-bracket">
-              <div className="w-16 h-16 border-2 border-deep-teal flex items-center justify-center mb-6 mx-auto">
-                <Users className="w-8 h-8 text-deep-teal" />
-              </div>
-              <h3 className="font-bold text-xl text-center mb-4 text-display text-charcoal">1인 운영</h3>
-              <p className="text-warm-gray text-center text-korean">
-                영업사원, PM, 사무실 임대료 거품 제거.
-              </p>
-            </div>
+          <div className="swiss-col-6">
+            <h3 className="swiss-heading-md mb-6">Joonbi Studio (-60%)</h3>
+            <ul className="swiss-list mb-8">
+              <li>개발비만 집중</li>
+            </ul>
+          </div>
 
-            <div className="atelier-card border-2 border-burnt-orange scroll-reveal corner-bracket">
-              <div className="w-16 h-16 border-2 border-burnt-orange flex items-center justify-center mb-6 mx-auto">
-                <Sparkles className="w-8 h-8 text-burnt-orange" />
-              </div>
-              <h3 className="font-bold text-xl text-center mb-4 text-display text-charcoal">AI 활용</h3>
-              <p className="text-warm-gray text-center text-korean">
-                코딩과 문서 작성 시간을 획기적으로 단축.
-              </p>
-            </div>
+          <div className="swiss-col-12">
+            <div className="swiss-hr" style={{ margin: 'var(--space-12) 0' }}></div>
+          </div>
 
-            <div className="atelier-card border-2 border-charcoal scroll-reveal corner-bracket">
-              <div className="w-16 h-16 border-2 border-charcoal flex items-center justify-center mb-6 mx-auto">
-                <Zap className="w-8 h-8 text-charcoal" />
-              </div>
-              <h3 className="font-bold text-xl text-center mb-4 text-display text-charcoal">소통 비용 제로</h3>
-              <p className="text-warm-gray text-center text-korean">
-                불필요한 미팅과 이동 시간을 없애 개발에만 집중.
-              </p>
-            </div>
+          <div className="swiss-col-12">
+            <h3 className="swiss-heading-md mb-6">3가지 이유</h3>
+            <table className="swiss-table">
+              <tbody>
+                <tr>
+                  <td>1인 운영</td>
+                  <td>영업사원, PM, 사무실 임대료 거품 제거.</td>
+                </tr>
+                <tr>
+                  <td>AI 활용</td>
+                  <td>코딩과 문서 작성 시간을 획기적으로 단축.</td>
+                </tr>
+                <tr>
+                  <td>소통 비용 제로</td>
+                  <td>불필요한 미팅과 이동 시간을 없애 개발에만 집중.</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
