@@ -16,7 +16,13 @@ import {
   ApiBody,
 } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
-import { LoginDto, RegisterDto, TokenResponseDto, RefreshTokenDto } from './dto';
+import {
+  LoginDto,
+  RegisterDto,
+  TokenResponseDto,
+  RefreshTokenDto,
+  UserPayloadDto,
+} from './dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { CurrentUser } from './decorators/current-user.decorator';
 import { Public } from './decorators/public.decorator';
