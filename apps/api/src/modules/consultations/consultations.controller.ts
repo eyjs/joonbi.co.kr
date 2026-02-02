@@ -27,6 +27,7 @@ import {
 } from './dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { AuthenticatedUser } from '../../common/types';
 
 @ApiTags('상담')
 @Controller('consultations')
@@ -47,7 +48,7 @@ export class ConsultationsController {
     description: '인증 필요',
   })
   async findAll(
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
   ): Promise<ConsultationResponseDto[]> {
     return this.consultationsService.findAll(user.id);
   }
@@ -69,7 +70,7 @@ export class ConsultationsController {
   })
   async findOne(
     @Param('id') id: string,
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
   ): Promise<ConsultationResponseDto> {
     return this.consultationsService.findById(id, user.id);
   }
@@ -92,7 +93,7 @@ export class ConsultationsController {
   })
   async create(
     @Body() createConsultationDto: CreateConsultationDto,
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
   ): Promise<ConsultationResponseDto> {
     return this.consultationsService.create(user.id, createConsultationDto);
   }
@@ -114,7 +115,7 @@ export class ConsultationsController {
   })
   async getFiles(
     @Param('id') id: string,
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
   ): Promise<ConsultationFileResponseDto[]> {
     return this.consultationsService.getFiles(id, user.id);
   }
@@ -136,7 +137,7 @@ export class ConsultationsController {
   })
   async getDesigns(
     @Param('id') id: string,
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
   ): Promise<ConsultationDesignResponseDto[]> {
     return this.consultationsService.getDesigns(id, user.id);
   }
@@ -167,7 +168,7 @@ export class ConsultationsController {
   @UseInterceptors(FileInterceptor('file'))
   async uploadFile(
     @UploadedFile() file: Express.Multer.File,
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
   ): Promise<{
     filePath: string;
     fileName: string;

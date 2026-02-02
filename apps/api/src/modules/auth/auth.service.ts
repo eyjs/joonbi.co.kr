@@ -10,6 +10,8 @@ import * as bcrypt from 'bcryptjs';
 import { PrismaService } from '../../prisma/prisma.service';
 import { RegisterDto } from './dto/register.dto';
 import { TokenResponseDto, UserPayloadDto } from './dto/token.dto';
+import { AuthenticatedUser } from '../../common/types';
+import { User } from '@prisma/client';
 
 @Injectable()
 export class AuthService {
@@ -43,7 +45,7 @@ export class AuthService {
     return this.generateTokens(user);
   }
 
-  async validateUser(email: string, password: string): Promise<any> {
+  async validateUser(email: string, password: string): Promise<User> {
     const user = await this.prisma.user.findUnique({
       where: { email },
     });
@@ -61,7 +63,7 @@ export class AuthService {
     return user;
   }
 
-  async login(user: any): Promise<TokenResponseDto> {
+  async login(user: User): Promise<TokenResponseDto> {
     return this.generateTokens(user);
   }
 
@@ -108,7 +110,7 @@ export class AuthService {
     };
   }
 
-  private async generateTokens(user: any): Promise<TokenResponseDto> {
+  private async generateTokens(user: User): Promise<TokenResponseDto> {
     const payload = {
       sub: user.id,
       email: user.email,

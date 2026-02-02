@@ -18,6 +18,7 @@ import { NotificationsService } from './notifications.service';
 import { NotificationResponseDto, NotificationQueryDto } from './dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { AuthenticatedUser } from '../../common/types';
 
 @ApiTags('알림')
 @Controller('notifications')
@@ -38,7 +39,7 @@ export class NotificationsController {
     description: '인증 필요',
   })
   async findAll(
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
     @Query() query: NotificationQueryDto,
   ): Promise<NotificationResponseDto[]> {
     return this.notificationsService.findAll(user.id, query);
@@ -61,7 +62,7 @@ export class NotificationsController {
     description: '인증 필요',
   })
   async getUnreadCount(
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
   ): Promise<{ count: number }> {
     return this.notificationsService.getUnreadCount(user.id);
   }
@@ -83,7 +84,7 @@ export class NotificationsController {
   })
   async markAsRead(
     @Param('id') id: string,
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
   ): Promise<NotificationResponseDto> {
     const notification = await this.notificationsService.markAsRead(
       id,
@@ -114,7 +115,7 @@ export class NotificationsController {
     description: '인증 필요',
   })
   async markAllAsRead(
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
   ): Promise<{ count: number }> {
     return this.notificationsService.markAllAsRead(user.id);
   }

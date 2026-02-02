@@ -22,6 +22,7 @@ import {
 } from './dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { AuthenticatedUser } from '../../common/types';
 
 @ApiTags('산출물 (고객)')
 @Controller('documents')
@@ -47,7 +48,7 @@ export class DocumentsController {
   })
   async findOne(
     @Param('id') id: string,
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
   ): Promise<DocumentResponseDto> {
     return this.documentsService.findById(id, user.id);
   }
@@ -74,7 +75,7 @@ export class DocumentsController {
   async createFeedback(
     @Param('id') id: string,
     @Body() createFeedbackDto: CreateFeedbackDto,
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
   ): Promise<FeedbackResponseDto> {
     return this.documentsService.createFeedback(id, user.id, createFeedbackDto);
   }
@@ -101,7 +102,7 @@ export class DocumentsController {
   async approve(
     @Param('id') id: string,
     @Body() approveDocumentDto: ApproveDocumentDto,
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
   ): Promise<DocumentResponseDto> {
     return this.documentsService.approve(id, user.id, approveDocumentDto);
   }

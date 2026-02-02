@@ -20,6 +20,7 @@ import { LoginDto, RegisterDto, TokenResponseDto, RefreshTokenDto } from './dto'
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { CurrentUser } from './decorators/current-user.decorator';
 import { Public } from './decorators/public.decorator';
+import { AuthenticatedUser } from '../../common/types';
 
 @ApiTags('인증')
 @Controller('auth')
@@ -100,7 +101,7 @@ export class AuthController {
     status: HttpStatus.UNAUTHORIZED,
     description: '인증 필요',
   })
-  async getMe(@CurrentUser() user: any): Promise<any> {
+  async getMe(@CurrentUser() user: AuthenticatedUser): Promise<UserPayloadDto> {
     return this.authService.getMe(user.id);
   }
 

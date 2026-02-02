@@ -3,6 +3,7 @@ import {
   NotFoundException,
   BadRequestException,
   ForbiddenException,
+  Logger,
 } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { Cron, CronExpression } from '@nestjs/schedule';
@@ -33,6 +34,8 @@ export class DocumentsService {
     'DOC-03': 20,
     'DOC-04': 10,
   };
+
+  private readonly logger = new Logger(DocumentsService.name);
 
   constructor(private readonly prisma: PrismaService) {}
 
@@ -279,13 +282,13 @@ export class DocumentsService {
         },
       });
 
-      console.log(
+      this.logger.log(
         `[Auto Approval] Document ${document.docCode} (${document.id}) has been automatically approved.`,
       );
     }
 
     if (documentsToAutoApprove.length > 0) {
-      console.log(
+      this.logger.log(
         `[Auto Approval] Total ${documentsToAutoApprove.length} documents auto-approved.`,
       );
     }

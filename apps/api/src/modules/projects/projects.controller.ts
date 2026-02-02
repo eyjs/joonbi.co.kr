@@ -29,7 +29,8 @@ import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
 import { RolesGuard } from '@/common/guards/roles.guard';
 import { Roles } from '@/common/decorators/roles.decorator';
 import { CurrentUser } from '@/common/decorators/current-user.decorator';
-import { User, Role } from '@prisma/client';
+import { Role } from '@prisma/client';
+import { AuthenticatedUser } from '@/common/types';
 
 @ApiTags('projects')
 @Controller('projects')
@@ -48,7 +49,7 @@ export class ProjectsController {
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'limit', required: false, type: Number, example: 20 })
   async findAll(
-    @CurrentUser() user: User,
+    @CurrentUser() user: AuthenticatedUser,
     @Query('page') page?: number,
     @Query('limit') limit?: number,
   ): Promise<ProjectListResponseDto> {
@@ -68,7 +69,7 @@ export class ProjectsController {
   })
   @ApiResponse({ status: 404, description: '프로젝트를 찾을 수 없습니다' })
   async findOne(
-    @CurrentUser() user: User,
+    @CurrentUser() user: AuthenticatedUser,
     @Param('id') id: string,
   ): Promise<ProjectResponseDto> {
     return this.projectsService.findOne(id, user.id);

@@ -5,6 +5,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { timingSafeEqual } from 'crypto';
 
 @Injectable()
 export class InternalApiGuard implements CanActivate {
@@ -16,7 +17,19 @@ export class InternalApiGuard implements CanActivate {
 
     const validKey = this.configService.get<string>('INTERNAL_API_KEY');
 
-    if (!apiKey || apiKey !== validKey) {
+    if (!apiKey || !validKey) {
+      throw new UnauthorizedException('Invalid internal API key');
+    }
+
+    // 타이밍 공격 방지를 위한 상수 시간 비교
+    const apiKeyBuffer = Buffer.from(apiKey);
+    const validKeyBuffer = Buffer.from(validKey);
+
+    if (apiKeyBuffer.length !== validKeyBuffer.length) {
+      throw new UnauthorizedException('Invalid internal API key');
+    }
+
+    if (!timingSafeEqual(apiKeyBuffer, validKeyBuffer)) {
       throw new UnauthorizedException('Invalid internal API key');
     }
 

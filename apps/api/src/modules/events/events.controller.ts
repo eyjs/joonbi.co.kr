@@ -27,6 +27,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { Roles } from '../auth/decorators/roles.decorator';
+import { AuthenticatedUser } from '../../common/types';
 
 @ApiTags('이벤트 슬롯')
 @Controller()
@@ -113,7 +114,7 @@ export class EventsController {
   })
   async claimSlot(
     @Body() claimSlotDto: ClaimSlotDto,
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
   ): Promise<{ event: EventResponseDto; ticketId: string }> {
     return this.eventsService.claimSlot(user.id, claimSlotDto);
   }

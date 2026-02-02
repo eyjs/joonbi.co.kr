@@ -150,6 +150,9 @@ export class PaymentsService {
     }
 
     if (dto.status === WebhookStatus.PAID) {
+      // PortOne 결제 검증
+      await this.verifyPortOnePayment(dto.imp_uid, dto.amount);
+
       if (payment.amount !== dto.amount) {
         throw new BadRequestException('결제 금액이 일치하지 않습니다');
       }

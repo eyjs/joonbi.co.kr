@@ -19,6 +19,7 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { Role } from '@prisma/client';
+import { AuthenticatedUser } from '../../common/types';
 
 @ApiTags('결제')
 @Controller('payments')
@@ -37,7 +38,7 @@ export class PaymentsController {
     status: HttpStatus.UNAUTHORIZED,
     description: '인증 필요',
   })
-  async findAll(@CurrentUser() user: any): Promise<any[]> {
+  async findAll(@CurrentUser() user: AuthenticatedUser): Promise<any[]> {
     return this.paymentsService.findAll(user.id);
   }
 
@@ -58,7 +59,7 @@ export class PaymentsController {
     description: '잘못된 요청',
   })
   async prepare(
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
     @Body() dto: PreparePaymentDto,
   ): Promise<{ paymentId: string; merchantUid: string; amount: number }> {
     return this.paymentsService.prepare(user.id, dto);
@@ -85,7 +86,7 @@ export class PaymentsController {
     description: '이미 처리된 결제',
   })
   async complete(
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
     @Body() dto: CompletePaymentDto,
   ): Promise<any> {
     return this.paymentsService.complete(user.id, dto);

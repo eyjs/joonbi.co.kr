@@ -27,7 +27,8 @@ import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
 import { RolesGuard } from '@/common/guards/roles.guard';
 import { Roles } from '@/common/decorators/roles.decorator';
 import { CurrentUser } from '@/common/decorators/current-user.decorator';
-import { User, Role } from '@prisma/client';
+import { Role } from '@prisma/client';
+import { AuthenticatedUser } from '@/common/types';
 
 @ApiTags('projects/messages')
 @Controller('projects/:projectId/messages')
@@ -48,7 +49,7 @@ export class MessagesController {
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'limit', required: false, type: Number, example: 50 })
   async findAll(
-    @CurrentUser() user: User,
+    @CurrentUser() user: AuthenticatedUser,
     @Param('projectId') projectId: string,
     @Query('page') page?: number,
     @Query('limit') limit?: number,
@@ -72,7 +73,7 @@ export class MessagesController {
   @ApiResponse({ status: 404, description: '프로젝트를 찾을 수 없습니다' })
   @HttpCode(HttpStatus.CREATED)
   async create(
-    @CurrentUser() user: User,
+    @CurrentUser() user: AuthenticatedUser,
     @Param('projectId') projectId: string,
     @Body() dto: CreateMessageDto,
   ): Promise<MessageResponseDto> {
@@ -94,7 +95,7 @@ export class MessagesUnreadController {
     description: '안 읽은 메시지 수 조회 성공',
     type: UnreadCountResponseDto,
   })
-  async getUnreadCount(@CurrentUser() user: User): Promise<UnreadCountResponseDto> {
+  async getUnreadCount(@CurrentUser() user: AuthenticatedUser): Promise<UnreadCountResponseDto> {
     return this.messagesService.getUnreadCount(user.id);
   }
 }
@@ -139,7 +140,7 @@ export class AdminMessagesController {
   @ApiResponse({ status: 404, description: '프로젝트를 찾을 수 없습니다' })
   @HttpCode(HttpStatus.CREATED)
   async create(
-    @CurrentUser() user: User,
+    @CurrentUser() user: AuthenticatedUser,
     @Param('projectId') projectId: string,
     @Body() dto: CreateMessageDto,
   ): Promise<MessageResponseDto> {
