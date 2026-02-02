@@ -26,15 +26,21 @@ export class EmailsService {
 
     if (!apiKey) {
       this.logger.warn('RESEND_API_KEY is not configured. Email service will not work.');
+      this.resend = null;
+    } else {
+      this.resend = new Resend(apiKey);
     }
-
-    this.resend = new Resend(apiKey);
   }
 
   async sendConsultationResult(
     email: string,
     consultation: ConsultationResultData,
   ): Promise<{ success: boolean; messageId?: string; error?: string }> {
+    if (!this.resend) {
+      this.logger.warn('Email service is not configured. Skipping email send.');
+      return { success: false, error: 'Email service not configured' };
+    }
+
     try {
       this.logger.log(`Sending consultation result email to ${email}`);
 
@@ -64,6 +70,11 @@ export class EmailsService {
     email: string,
     payment: PaymentRequestData,
   ): Promise<{ success: boolean; messageId?: string; error?: string }> {
+    if (!this.resend) {
+      this.logger.warn('Email service is not configured. Skipping email send.');
+      return { success: false, error: 'Email service not configured' };
+    }
+
     try {
       this.logger.log(`Sending payment request email to ${email}`);
 
@@ -93,6 +104,11 @@ export class EmailsService {
     email: string,
     document: DocumentReadyData,
   ): Promise<{ success: boolean; messageId?: string; error?: string }> {
+    if (!this.resend) {
+      this.logger.warn('Email service is not configured. Skipping email send.');
+      return { success: false, error: 'Email service not configured' };
+    }
+
     try {
       this.logger.log(`Sending document ready email to ${email}`);
 
@@ -122,6 +138,11 @@ export class EmailsService {
     email: string,
     reminder: ReviewReminderData,
   ): Promise<{ success: boolean; messageId?: string; error?: string }> {
+    if (!this.resend) {
+      this.logger.warn('Email service is not configured. Skipping email send.');
+      return { success: false, error: 'Email service not configured' };
+    }
+
     try {
       this.logger.log(`Sending review reminder email to ${email}`);
 
@@ -152,6 +173,11 @@ export class EmailsService {
     email: string,
     project: ProjectCompletedData,
   ): Promise<{ success: boolean; messageId?: string; error?: string }> {
+    if (!this.resend) {
+      this.logger.warn('Email service is not configured. Skipping email send.');
+      return { success: false, error: 'Email service not configured' };
+    }
+
     try {
       this.logger.log(`Sending project completed email to ${email}`);
 
@@ -187,6 +213,11 @@ export class EmailsService {
     failed: number;
     errors?: string[];
   }> {
+    if (!this.resend) {
+      this.logger.warn('Email service is not configured. Skipping bulk email send.');
+      return { success: false, sent: 0, failed: emails.length, errors: ['Email service not configured'] };
+    }
+
     this.logger.log(`Sending bulk emails to ${emails.length} recipients`);
 
     const results = await Promise.allSettled(
