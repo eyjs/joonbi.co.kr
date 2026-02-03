@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Button } from '@/components/ui/button';
 import { useAuthStore } from '@/stores/auth';
 
 export function Header() {
@@ -15,29 +14,32 @@ export function Header() {
   };
 
   return (
-    <nav className="fixed top-0 w-full bg-white/80 backdrop-blur-sm border-b z-50">
+    <nav className="fixed top-0 w-full backdrop-blur-sm border-b z-50" style={{
+      background: 'rgba(10, 14, 39, 0.9)',
+      borderColor: 'var(--tech-border)'
+    }}>
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-        <Link href="/" className="text-xl font-bold text-primary">
+        <Link href="/" className="text-xl font-bold tech-glow-text">
           준비스튜디오
         </Link>
 
         <div className="hidden md:flex gap-6">
           <Link
             href="/#features"
-            className="text-sm hover:text-primary transition-colors"
+            className="text-sm text-gray-300 hover:text-cyan-400 transition-colors"
           >
             서비스 소개
           </Link>
           <Link
             href="/#process"
-            className="text-sm hover:text-primary transition-colors"
+            className="text-sm text-gray-300 hover:text-cyan-400 transition-colors"
           >
             프로세스
           </Link>
           {isAuthenticated && (
             <Link
               href="/dashboard"
-              className="text-sm hover:text-primary transition-colors"
+              className="text-sm text-gray-300 hover:text-cyan-400 transition-colors"
             >
               대시보드
             </Link>
@@ -47,22 +49,25 @@ export function Header() {
         <div className="flex gap-2 items-center">
           {isAuthenticated ? (
             <>
-              <span className="text-sm text-muted-foreground hidden md:inline">
+              <span className="text-sm text-gray-400 hidden md:inline">
                 {user?.name}님
               </span>
-              <Button variant="ghost" size="sm" onClick={handleLogout}>
+              <button
+                className="text-sm px-3 py-1.5 text-gray-300 hover:text-cyan-400 transition-colors"
+                onClick={handleLogout}
+              >
                 로그아웃
-              </Button>
+              </button>
             </>
           ) : (
             <>
               <Link href="/login">
-                <Button variant="ghost" size="sm">
+                <button className="text-sm px-3 py-1.5 text-gray-300 hover:text-cyan-400 transition-colors">
                   로그인
-                </Button>
+                </button>
               </Link>
               <Link href="/consultation">
-                <Button size="sm">상담 신청</Button>
+                <button className="tech-btn-primary text-sm px-4 py-2">상담 신청</button>
               </Link>
             </>
           )}
