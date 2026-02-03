@@ -37,12 +37,17 @@ export function Footer() {
           <div>
             <h3 className="font-semibold mb-4">연락처</h3>
             <div className="flex flex-col gap-2 text-sm text-muted-foreground">
-              <p>이메일: contact@joonbi.co.kr</p>
+              <p>이메일: wnstn1342@gmail.com</p>
             </div>
           </div>
         </div>
-        <div className="mt-8 pt-8 border-t text-center text-sm text-muted-foreground">
-          © 2024 준비스튜디오. All rights reserved.
+        <div className="mt-8 pt-8 border-t text-sm text-muted-foreground">
+          <div className="flex flex-col gap-1 mb-4">
+            <p>상호: 준비스튜디오 | 대표: 이준수</p>
+            <p>사업자등록번호: 318-08-03340</p>
+            <p>주소: 서울특별시 강남구 논현로10길 30, 5층 505-S87호(개포동)</p>
+          </div>
+          <p className="text-center">© 2024 준비스튜디오. All rights reserved.</p>
         </div>
       </div>
     </footer>
