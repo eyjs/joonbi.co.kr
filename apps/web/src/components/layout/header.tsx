@@ -38,7 +38,7 @@ export function Header() {
           </Link>
           {isAuthenticated && (
             <Link
-              href="/dashboard"
+              href="/admin/dashboard"
               className="text-sm text-gray-300 hover:text-cyan-400 transition-colors"
             >
               대시보드
@@ -60,16 +60,9 @@ export function Header() {
               </button>
             </>
           ) : (
-            <>
-              <Link href="/login">
-                <button className="text-sm px-3 py-1.5 text-gray-300 hover:text-cyan-400 transition-colors">
-                  로그인
-                </button>
-              </Link>
-              <Link href="/consultation">
-                <button className="tech-btn-primary text-sm px-4 py-2">상담 신청</button>
-              </Link>
-            </>
+            <Link href="/consultation">
+              <button className="tech-btn-primary text-sm px-4 py-2">상담 신청</button>
+            </Link>
           )}
         </div>
       </div>

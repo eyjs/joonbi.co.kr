@@ -47,7 +47,12 @@ export function Footer() {
             <p>사업자등록번호: 318-08-03340</p>
             <p>주소: 서울특별시 강남구 논현로10길 30, 5층 505-S87호(개포동)</p>
           </div>
-          <p className="text-center">© 2024 준비스튜디오. All rights reserved.</p>
+          <div className="flex justify-between items-center">
+            <p>© 2024 준비스튜디오. All rights reserved.</p>
+            <Link href="/login" className="text-xs text-gray-500 hover:text-gray-400 transition-colors">
+              관리자
+            </Link>
+          </div>
         </div>
       </div>
     </footer>

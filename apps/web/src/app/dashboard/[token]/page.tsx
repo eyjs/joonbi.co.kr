@@ -3,8 +3,6 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
 
@@ -96,10 +94,10 @@ export default function TokenDashboardPage() {
     return (
       <>
         <Header />
-        <div className="min-h-screen pt-24 pb-12 px-4 flex items-center justify-center">
+        <div className="min-h-screen pt-24 pb-12 px-4 flex items-center justify-center" style={{ background: 'var(--tech-bg-dark)' }}>
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-            <p className="text-muted-foreground">프로젝트 정보를 불러오는 중...</p>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-500 mx-auto mb-4"></div>
+            <p className="tech-text">프로젝트 정보를 불러오는 중...</p>
           </div>
         </div>
         <Footer />
@@ -111,18 +109,16 @@ export default function TokenDashboardPage() {
     return (
       <>
         <Header />
-        <div className="min-h-screen pt-24 pb-12 px-4 flex items-center justify-center">
-          <Card className="max-w-md w-full">
-            <CardHeader>
-              <CardTitle>접근 오류</CardTitle>
-              <CardDescription>{error || '프로젝트를 찾을 수 없습니다'}</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Link href="/">
-                <Button className="w-full">홈으로 돌아가기</Button>
-              </Link>
-            </CardContent>
-          </Card>
+        <div className="min-h-screen pt-24 pb-12 px-4 flex items-center justify-center" style={{ background: 'var(--tech-bg-dark)' }}>
+          <div className="tech-card max-w-md w-full">
+            <div className="mb-4">
+              <h2 className="tech-heading-md mb-2">접근 오류</h2>
+              <p className="tech-text">{error || '프로젝트를 찾을 수 없습니다'}</p>
+            </div>
+            <Link href="/">
+              <button className="tech-btn-primary w-full">홈으로 돌아가기</button>
+            </Link>
+          </div>
         </div>
         <Footer />
       </>
@@ -149,127 +145,114 @@ export default function TokenDashboardPage() {
   return (
     <>
       <Header />
-      <div className="min-h-screen pt-24 pb-12 px-4 bg-muted/30">
+      <div className="min-h-screen pt-24 pb-12 px-4" style={{ background: 'var(--tech-bg-dark)' }}>
         <div className="container mx-auto max-w-6xl">
           {/* Project Header */}
           <div className="mb-8">
-            <h1 className="text-3xl font-bold mb-2">{project.projectName}</h1>
-            <p className="text-muted-foreground">
+            <h1 className="tech-heading-lg mb-2">{project.projectName}</h1>
+            <p className="tech-text">
               {project.projectCode} • {statusLabels[project.status] || project.status}
             </p>
           </div>
 
           {/* Progress Bar */}
-          <Card className="mb-8">
-            <CardHeader>
-              <div className="flex justify-between items-center">
-                <CardTitle>전체 진행률</CardTitle>
-                <span className="text-3xl font-bold text-primary">{progress}%</span>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="w-full bg-gray-200 rounded-full h-4">
-                <div
-                  className="bg-primary h-4 rounded-full transition-all duration-500"
-                  style={{ width: `${progress}%` }}
-                ></div>
-              </div>
-            </CardContent>
-          </Card>
+          <div className="tech-card mb-8">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="tech-heading-md">전체 진행률</h2>
+              <span className="text-3xl font-bold tech-glow-text">{progress}%</span>
+            </div>
+            <div className="w-full bg-gray-800 rounded-full h-4">
+              <div
+                className="h-4 rounded-full transition-all duration-500"
+                style={{
+                  width: `${progress}%`,
+                  background: 'linear-gradient(90deg, var(--tech-gradient-start), var(--tech-gradient-end))'
+                }}
+              ></div>
+            </div>
+          </div>
 
           <div className="grid md:grid-cols-2 gap-8">
             {/* Documents */}
             <section>
-              <h2 className="text-2xl font-semibold mb-4">산출물</h2>
+              <h2 className="tech-heading-md mb-4">산출물</h2>
               <div className="space-y-4">
                 {project.documents && project.documents.length > 0 ? (
                   project.documents.map((doc) => (
-                    <Card key={doc.id}>
-                      <CardHeader>
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <CardTitle className="text-lg">{doc.docName}</CardTitle>
-                            <CardDescription>{doc.docCode}</CardDescription>
-                          </div>
-                          <span className="px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
-                            {docStatusLabels[doc.status] || doc.status}
-                          </span>
+                    <div key={doc.id} className="tech-card">
+                      <div className="flex justify-between items-start mb-4">
+                        <div>
+                          <h3 className="text-lg font-bold text-white">{doc.docName}</h3>
+                          <p className="tech-text text-sm">{doc.docCode}</p>
                         </div>
-                      </CardHeader>
+                        <span className="px-3 py-1 rounded-full text-xs font-medium bg-blue-500/20 text-blue-400 border border-blue-500/40">
+                          {docStatusLabels[doc.status] || doc.status}
+                        </span>
+                      </div>
                       {doc.filePath && (
-                        <CardContent>
-                          <a href={doc.filePath} target="_blank" rel="noopener noreferrer">
-                            <Button variant="outline" size="sm">
-                              파일 다운로드
-                            </Button>
-                          </a>
-                        </CardContent>
+                        <a href={doc.filePath} target="_blank" rel="noopener noreferrer">
+                          <button className="tech-btn-secondary text-sm px-4 py-2">
+                            파일 다운로드
+                          </button>
+                        </a>
                       )}
-                    </Card>
+                    </div>
                   ))
                 ) : (
-                  <Card>
-                    <CardContent className="py-8 text-center text-muted-foreground">
-                      아직 산출물이 없습니다
-                    </CardContent>
-                  </Card>
+                  <div className="tech-card py-8 text-center">
+                    <p className="tech-text">아직 산출물이 없습니다</p>
+                  </div>
                 )}
               </div>
             </section>
 
             {/* Info */}
             <section>
-              <h2 className="text-2xl font-semibold mb-4">프로젝트 정보</h2>
-              <Card className="mb-4">
-                <CardHeader>
-                  <CardTitle>일정</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-2">
+              <h2 className="tech-heading-md mb-4">프로젝트 정보</h2>
+              <div className="tech-card mb-4">
+                <h3 className="text-lg font-bold text-white mb-4">일정</h3>
+                <div className="space-y-2">
                   {project.startDate && (
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">시작일</span>
-                      <span>{new Date(project.startDate).toLocaleDateString()}</span>
+                      <span className="tech-text">시작일</span>
+                      <span className="text-white">{new Date(project.startDate).toLocaleDateString()}</span>
                     </div>
                   )}
                   {project.expectedEndDate && (
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">예상 완료일</span>
-                      <span>{new Date(project.expectedEndDate).toLocaleDateString()}</span>
+                      <span className="tech-text">예상 완료일</span>
+                      <span className="text-white">{new Date(project.expectedEndDate).toLocaleDateString()}</span>
                     </div>
                   )}
-                </CardContent>
-              </Card>
+                </div>
+              </div>
 
-              <Card>
-                <CardHeader>
-                  <CardTitle>결제 정보</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="mb-4 pb-4 border-b">
-                    <div className="flex justify-between text-lg font-semibold">
-                      <span>총 금액</span>
-                      <span>{project.totalAmount.toLocaleString()}원</span>
-                    </div>
+              <div className="tech-card">
+                <h3 className="text-lg font-bold text-white mb-4">결제 정보</h3>
+                <div className="mb-4 pb-4 border-b border-gray-700">
+                  <div className="flex justify-between text-lg font-semibold">
+                    <span className="text-white">총 금액</span>
+                    <span className="tech-glow-text">{project.totalAmount.toLocaleString()}원</span>
                   </div>
-                  {project.payments && project.payments.length > 0 ? (
-                    <div className="space-y-2">
-                      {project.payments.map((payment) => (
-                        <div key={payment.id} className="flex justify-between text-sm">
-                          <span className="text-muted-foreground">
-                            {payment.paymentType === 'CONTRACT' ? '계약금' :
-                             payment.paymentType === 'FINAL' ? '잔금' : '추가'}
-                          </span>
-                          <span className={payment.status === 'COMPLETED' ? 'text-green-600' : ''}>
-                            {payment.amount.toLocaleString()}원 ({payment.status === 'COMPLETED' ? '완료' : '대기'})
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-sm text-muted-foreground">결제 정보가 없습니다</p>
-                  )}
-                </CardContent>
-              </Card>
+                </div>
+                {project.payments && project.payments.length > 0 ? (
+                  <div className="space-y-2">
+                    {project.payments.map((payment) => (
+                      <div key={payment.id} className="flex justify-between text-sm">
+                        <span className="tech-text">
+                          {payment.paymentType === 'CONTRACT' ? '계약금' :
+                           payment.paymentType === 'FINAL' ? '잔금' : '추가'}
+                        </span>
+                        <span className={payment.status === 'COMPLETED' ? 'text-green-400' : 'text-gray-400'}>
+                          {payment.amount.toLocaleString()}원 ({payment.status === 'COMPLETED' ? '완료' : '대기'})
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm tech-text">결제 정보가 없습니다</p>
+                )}
+              </div>
             </section>
           </div>
         </div>

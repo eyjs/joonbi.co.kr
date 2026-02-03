@@ -27,7 +27,7 @@ export default function LoginPage() {
       } as LoginRequest);
 
       setAuth(response.accessToken, response.refreshToken, response.user);
-      router.push('/dashboard');
+      router.push('/admin/dashboard');
     } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message);
@@ -46,9 +46,9 @@ export default function LoginPage() {
           <Link href="/" className="tech-heading-md tech-glow-text mb-4 inline-block">
             준비스튜디오
           </Link>
-          <h1 className="tech-heading-md mb-2">로그인</h1>
+          <h1 className="tech-heading-md mb-2">관리자 로그인</h1>
           <p className="tech-text">
-            계정에 로그인하여 프로젝트를 확인하세요
+            관리자 계정으로 로그인하여 프로젝트를 관리하세요
           </p>
         </div>
         <form onSubmit={handleSubmit}>
@@ -96,7 +96,7 @@ export default function LoginPage() {
             </button>
 
             <div className="text-sm text-center text-gray-400">
-              아직 계정이 없으신가요?{' '}
+              고객이신가요?{' '}
               <Link href="/consultation" className="tech-glow-text hover:underline">
                 상담 신청하기
               </Link>
