@@ -50,6 +50,12 @@ const config: Config = {
         'deep-teal': '#2C5F5D',
         'warm-gray': '#8B7E74',
         'light-tan': '#E8E3DC',
+        coral: {
+          '50': '#fff1f0',
+          '100': '#ffe0dd',
+          '500': '#FF6B4A',
+          '600': '#e85a3a',
+        },
       },
       borderRadius: {
         lg: 'var(--radius)',

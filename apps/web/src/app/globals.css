@@ -3,44 +3,14 @@
 @tailwind utilities;
 
 :root {
-  /* Swiss Minimalism - Pure Black & White */
-  --black: #000000;
-  --white: #FFFFFF;
-  --gray-100: #F5F5F5;
-  --gray-200: #E5E5E5;
-  --gray-300: #D4D4D4;
-  --gray-800: #333333;
-
-  /* Grid System */
-  --grid-columns: 12;
-  --grid-gap: 24px;
-  --container-max: 1200px;
-
-  /* Typography Scale (Swiss precision) */
-  --text-xs: 12px;
-  --text-sm: 14px;
-  --text-base: 16px;
-  --text-lg: 18px;
-  --text-xl: 24px;
-  --text-2xl: 32px;
-  --text-3xl: 48px;
-  --text-4xl: 64px;
-  --text-5xl: 80px;
-  --text-6xl: 96px;
-
-  /* Spacing (Mathematical precision) */
-  --space-1: 8px;
-  --space-2: 16px;
-  --space-3: 24px;
-  --space-4: 32px;
-  --space-5: 40px;
-  --space-6: 48px;
-  --space-8: 64px;
-  --space-10: 80px;
-  --space-12: 96px;
-  --space-16: 128px;
-  --space-20: 160px;
-  --space-24: 192px;
+  --bg-primary: #F3F4F6;
+  --color-blue: #4F7DF3;
+  --color-coral: #FF6B4A;
+  --color-white: #FFFFFF;
+  --color-black: #1F2937;
+  --color-gray: #6B7280;
+  --border-radius: 16px;
+  --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
 }
 
 @layer base {
@@ -55,267 +25,145 @@
   }
 
   body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'Segoe UI',
-                 'Noto Sans KR', sans-serif;
-    font-size: var(--text-base);
-    line-height: 1.5;
-    color: var(--black);
-    background: var(--white);
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, 'Segoe UI', sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--color-black);
+    background: var(--bg-primary);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    font-weight: 400;
   }
 
   h1, h2, h3, h4, h5, h6 {
     font-weight: 700;
-    line-height: 1.1;
-    letter-spacing: -0.02em;
-  }
-
-  h1 {
-    font-size: var(--text-6xl);
-  }
-
-  h2 {
-    font-size: var(--text-4xl);
-  }
-
-  h3 {
-    font-size: var(--text-2xl);
-  }
-
-  p {
-    line-height: 1.6;
+    line-height: 1.3;
   }
 }
 
 @layer components {
-  /* Swiss Grid Container */
-  .swiss-container {
-    max-width: var(--container-max);
+  .container {
+    max-width: 1200px;
     margin: 0 auto;
-    padding: 0 var(--space-3);
+    padding: 0 20px;
   }
 
-  /* Section Spacing */
-  .swiss-section {
-    padding: var(--space-16) 0;
-    border-bottom: 1px solid var(--black);
+  .section {
+    padding: 80px 0;
   }
 
-  .swiss-section:last-of-type {
-    border-bottom: none;
+  .card {
+    background: var(--color-white);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    padding: 32px;
   }
 
-  /* Typography Components */
-  .swiss-heading-xl {
-    font-size: var(--text-6xl);
-    font-weight: 700;
-    line-height: 0.9;
-    letter-spacing: -0.03em;
-  }
-
-  .swiss-heading-lg {
-    font-size: var(--text-4xl);
-    font-weight: 700;
-    line-height: 1;
-    letter-spacing: -0.02em;
-  }
-
-  .swiss-heading-md {
-    font-size: var(--text-2xl);
+  .btn-primary {
+    display: inline-block;
+    padding: 16px 32px;
+    background: var(--color-blue);
+    color: var(--color-white);
+    border-radius: 12px;
     font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+  }
+
+  .btn-primary:hover {
+    background: #3d6ad6;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(79, 125, 243, 0.3);
+  }
+
+  .btn-secondary {
+    display: inline-block;
+    padding: 16px 32px;
+    background: var(--color-coral);
+    color: var(--color-white);
+    border-radius: 12px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+  }
+
+  .btn-secondary:hover {
+    background: #e85a3a;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(255, 107, 74, 0.3);
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 4px 12px;
+    background: var(--color-blue);
+    color: var(--color-white);
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .heading-xl {
+    font-size: 56px;
+    font-weight: 800;
     line-height: 1.2;
   }
 
-  .swiss-body {
-    font-size: var(--text-base);
-    line-height: 1.6;
-    font-weight: 400;
-  }
-
-  .swiss-caption {
-    font-size: var(--text-sm);
-    line-height: 1.4;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    font-weight: 500;
-  }
-
-  /* Section Number (Large background numerals) */
-  .swiss-section-number {
-    font-size: 200px;
-    font-weight: 900;
-    line-height: 1;
-    color: var(--gray-100);
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 0;
-    user-select: none;
-    pointer-events: none;
-  }
-
-  /* Horizontal Rule */
-  .swiss-hr {
-    width: 100%;
-    height: 1px;
-    background: var(--black);
-    border: none;
-    margin: var(--space-8) 0;
-  }
-
-  /* Button - Minimal Swiss Style */
-  .swiss-button {
-    display: inline-block;
-    padding: var(--space-2) var(--space-4);
-    background: var(--black);
-    color: var(--white);
-    border: 2px solid var(--black);
-    font-size: var(--text-base);
-    font-weight: 600;
-    text-decoration: none;
-    cursor: pointer;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    text-align: center;
-    letter-spacing: 0.02em;
-  }
-
-  .swiss-button:hover {
-    background: var(--white);
-    color: var(--black);
-  }
-
-  .swiss-button-outline {
-    background: var(--white);
-    color: var(--black);
-    border: 2px solid var(--black);
-  }
-
-  .swiss-button-outline:hover {
-    background: var(--black);
-    color: var(--white);
-  }
-
-  /* Grid Layout */
-  .swiss-grid {
-    display: grid;
-    grid-template-columns: repeat(12, 1fr);
-    gap: var(--grid-gap);
-  }
-
-  .swiss-col-1 { grid-column: span 1; }
-  .swiss-col-2 { grid-column: span 2; }
-  .swiss-col-3 { grid-column: span 3; }
-  .swiss-col-4 { grid-column: span 4; }
-  .swiss-col-5 { grid-column: span 5; }
-  .swiss-col-6 { grid-column: span 6; }
-  .swiss-col-7 { grid-column: span 7; }
-  .swiss-col-8 { grid-column: span 8; }
-  .swiss-col-9 { grid-column: span 9; }
-  .swiss-col-10 { grid-column: span 10; }
-  .swiss-col-11 { grid-column: span 11; }
-  .swiss-col-12 { grid-column: span 12; }
-
-  /* List - Clean minimal style */
-  .swiss-list {
-    list-style: none;
-    padding: 0;
-  }
-
-  .swiss-list li {
-    padding: var(--space-2) 0;
-    border-bottom: 1px solid var(--gray-200);
-  }
-
-  .swiss-list li:last-child {
-    border-bottom: none;
-  }
-
-  /* Data Display */
-  .swiss-stat {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-1);
-  }
-
-  .swiss-stat-value {
-    font-size: var(--text-4xl);
+  .heading-lg {
+    font-size: 40px;
     font-weight: 700;
-    line-height: 1;
+    line-height: 1.3;
   }
 
-  .swiss-stat-label {
-    font-size: var(--text-sm);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--gray-800);
+  .heading-md {
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 1.3;
   }
 
-  /* Table - Swiss precision */
-  .swiss-table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-
-  .swiss-table th,
-  .swiss-table td {
-    padding: var(--space-2) var(--space-3);
-    text-align: left;
-    border-bottom: 1px solid var(--black);
-  }
-
-  .swiss-table th {
+  .heading-sm {
+    font-size: 24px;
     font-weight: 600;
-    font-size: var(--text-sm);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
+    line-height: 1.4;
   }
 
-  .swiss-table td {
-    font-size: var(--text-base);
+  .text-gray {
+    color: var(--color-gray);
+  }
+
+  .gradient-text {
+    background: linear-gradient(135deg, var(--color-blue) 0%, var(--color-coral) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
 }
 
-@layer utilities {
-  .bg-black { background-color: var(--black); }
-  .bg-white { background-color: var(--white); }
-  .bg-gray-100 { background-color: var(--gray-100); }
-
-  .text-black { color: var(--black); }
-  .text-white { color: var(--white); }
-  .text-gray-800 { color: var(--gray-800); }
-
-  .border-black { border-color: var(--black); }
-  .border-white { border-color: var(--white); }
-}
-
-/* Responsive adjustments */
 @media (max-width: 768px) {
-  :root {
-    --text-6xl: 48px;
-    --text-4xl: 36px;
-    --text-2xl: 24px;
-    --space-16: 64px;
-    --space-12: 48px;
+  .section {
+    padding: 60px 0;
   }
 
-  .swiss-grid {
-    grid-template-columns: repeat(4, 1fr);
+  .heading-xl {
+    font-size: 36px;
   }
 
-  .swiss-col-1,
-  .swiss-col-2,
-  .swiss-col-3,
-  .swiss-col-4,
-  .swiss-col-5,
-  .swiss-col-6,
-  .swiss-col-7,
-  .swiss-col-8,
-  .swiss-col-9,
-  .swiss-col-10,
-  .swiss-col-11,
-  .swiss-col-12 {
-    grid-column: span 4;
+  .heading-lg {
+    font-size: 28px;
+  }
+
+  .heading-md {
+    font-size: 24px;
+  }
+
+  .heading-sm {
+    font-size: 20px;
+  }
+
+  .card {
+    padding: 24px;
   }
 }
