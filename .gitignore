@@ -52,3 +52,6 @@ _archive/
 
 # Playwright MCP cache
 .playwright-mcp/
+
+# Claude Code local settings
+.claude/settings.local.json
