@@ -55,3 +55,7 @@ _archive/
 
 # Claude Code local settings
 .claude/settings.local.json
+
+# Environment files (실제 값 포함)
+.env.development
+.env.production
