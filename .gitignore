@@ -14,6 +14,9 @@ out/
 .env.local
 .env*.local
 
+# Frontend Production (NEXT_PUBLIC_ 변수만 포함, Git 추적 OK)
+!apps/web/.env.production
+
 # IDE
 .idea/
 .vscode/
@@ -56,6 +59,9 @@ _archive/
 # Claude Code local settings
 .claude/settings.local.json
 
-# Environment files (실제 값 포함)
+# Backend Environment files (실제 값 포함, 비밀키 있음)
 .env.development
 .env.production
+
+# Frontend Production (NEXT_PUBLIC_ 변수만, Git 추적 OK)
+!apps/web/.env.production
