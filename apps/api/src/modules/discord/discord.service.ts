@@ -18,9 +18,13 @@ export class DiscordService {
       return;
     }
 
+    // Clawdbot User ID (환경변수로 설정 권장)
+    const clawbotUserId = this.config.get<string>('CLAWDBOT_USER_ID');
+    const mentionPrefix = clawbotUserId ? `<@${clawbotUserId}> ` : '';
+
     const message = {
       content: [
-        `[JOONBI_FULL_ANALYSIS]`,
+        `${mentionPrefix}[JOONBI_FULL_ANALYSIS]`,
         `ID: ${consultation.id}`,
         `PROJECT: ${consultation.projectName}`,
         `BUDGET: ${consultation.budgetRange || '미정'}`,
