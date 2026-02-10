@@ -8,8 +8,30 @@ async function bootstrap(): Promise<void> {
 
   app.setGlobalPrefix('api');
 
+  // CORS 설정: 여러 Frontend URL 허용
+  const allowedOrigins = [
+    'http://localhost:3000', // 로컬 개발
+    'https://joonbi.co.kr', // 프로덕션 (커스텀 도메인)
+    'https://joonbi-co-kr-web.vercel.app', // Vercel 자동 생성 URL
+  ];
+
   app.enableCors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    origin: (origin, callback) => {
+      // origin이 없는 경우 (같은 도메인 요청) 허용
+      if (!origin) return callback(null, true);
+
+      // Vercel preview 배포 (*.vercel.app) 모두 허용
+      if (origin.endsWith('.vercel.app')) {
+        return callback(null, true);
+      }
+
+      // 허용된 도메인 체크
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      callback(new Error('Not allowed by CORS'));
+    },
     credentials: true,
   });
 
