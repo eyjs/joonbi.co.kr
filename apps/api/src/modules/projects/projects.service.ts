@@ -1,7 +1,8 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '@/prisma/prisma.service';
 import { CreateProjectDto, UpdateProjectDto, ProjectProgressDto } from './dto';
-import { Project, ProjectStatus, DocumentStatus } from '@prisma/client';
+import { Project, ProjectStatus, DocumentStatus, Prisma } from '@prisma/client';
+import { PaginatedResponse } from '@/common/types';
 
 const STATUS_COMPLETION: Record<DocumentStatus, number> = {
   WAITING: 0,
@@ -50,7 +51,7 @@ export class ProjectsService {
     return project;
   }
 
-  async findAll(userId?: string, page = 1, limit = 20): Promise<{ data: Project[]; meta: any }> {
+  async findAll(userId?: string, page = 1, limit = 20): Promise<PaginatedResponse<Project>> {
     const where = userId ? { userId } : {};
 
     const [data, total] = await Promise.all([
@@ -74,7 +75,7 @@ export class ProjectsService {
   }
 
   async findOne(id: string, userId?: string): Promise<Project> {
-    const where: any = { id };
+    const where: Prisma.ProjectWhereInput = { id };
     if (userId) {
       where.userId = userId;
     }
@@ -238,7 +239,7 @@ export class ProjectsService {
       );
     }
 
-    const updateData: any = { status };
+    const updateData: Prisma.ProjectUpdateInput = { status };
 
     if (status === 'IN_PROGRESS' && !project.startDate) {
       updateData.startDate = new Date();

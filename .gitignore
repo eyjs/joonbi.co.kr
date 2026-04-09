@@ -42,6 +42,8 @@ coverage/
 
 # Prisma
 
+# GCS Key
+gcs-key.json
 
 # Uploads
 uploads/

@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { NotificationType } from '@prisma/client';
+import { Notification, NotificationType } from '@prisma/client';
 
 export class NotificationResponseDto {
   @ApiProperty({
@@ -51,7 +51,7 @@ export class NotificationResponseDto {
   })
   createdAt: Date;
 
-  constructor(notification: any) {
+  constructor(notification: Partial<Notification>) {
     Object.assign(this, notification);
   }
 }

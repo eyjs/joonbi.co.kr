@@ -2,6 +2,7 @@ import { Injectable, NotFoundException, ConflictException } from '@nestjs/common
 import { PrismaService } from '@/prisma/prisma.service';
 import { CreatePortfolioDto, UpdatePortfolioDto } from './dto';
 import { Portfolio } from '@prisma/client';
+import { PaginatedResponse } from '@/common/types';
 
 @Injectable()
 export class PortfoliosService {
@@ -57,7 +58,7 @@ export class PortfoliosService {
     return portfolio;
   }
 
-  async findAll(page = 1, limit = 20): Promise<{ data: Portfolio[]; meta: any }> {
+  async findAll(page = 1, limit = 20): Promise<PaginatedResponse<Portfolio>> {
     const where = { isPublic: true };
 
     const [data, total] = await Promise.all([

@@ -2,7 +2,8 @@ import { Injectable, NotFoundException, UnauthorizedException, ConflictException
 import { PrismaService } from '@/prisma/prisma.service';
 import { UpdateUserDto, ChangePasswordDto, UpdateRoleDto } from './dto';
 import { User, Role } from '@prisma/client';
-import * as bcrypt from 'bcrypt';
+import { PaginatedResponse } from '@/common/types';
+import * as bcrypt from 'bcryptjs';
 
 @Injectable()
 export class UsersService {
@@ -78,7 +79,7 @@ export class UsersService {
     });
   }
 
-  async findAll(page = 1, limit = 20): Promise<{ data: Omit<User, 'password'>[]; meta: any }> {
+  async findAll(page = 1, limit = 20): Promise<PaginatedResponse<Omit<User, 'password'>>> {
     const [data, total] = await Promise.all([
       this.prisma.user.findMany({
         orderBy: { createdAt: 'desc' },

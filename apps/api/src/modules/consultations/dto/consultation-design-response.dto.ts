@@ -1,4 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { ConsultationDesign } from '@prisma/client';
+
+interface ScreenInfo {
+  screenId: string;
+  screenName: string;
+  figmaUrl: string;
+}
 
 export class ConsultationDesignResponseDto {
   @ApiProperty({
@@ -34,7 +41,7 @@ export class ConsultationDesignResponseDto {
       },
     ],
   })
-  screens: any;
+  screens: ScreenInfo[];
 
   @ApiProperty({
     description: '생성일시',
@@ -42,7 +49,7 @@ export class ConsultationDesignResponseDto {
   })
   createdAt: Date;
 
-  constructor(design: any) {
+  constructor(design: Partial<ConsultationDesign>) {
     Object.assign(this, design);
   }
 }

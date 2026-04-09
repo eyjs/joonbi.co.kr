@@ -1,10 +1,17 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
+  Consultation,
   ConsultationType,
   ConsultationStatus,
   AnalysisStatus,
   Feasibility,
 } from '@prisma/client';
+
+interface AiFeature {
+  name: string;
+  price: number;
+  required: boolean;
+}
 
 export class ConsultationResponseDto {
   @ApiProperty({
@@ -121,7 +128,7 @@ export class ConsultationResponseDto {
       { name: '상품 목록', price: 150000, required: true },
     ],
   })
-  aiFeatures?: any;
+  aiFeatures?: AiFeature[] | null;
 
   @ApiPropertyOptional({
     description: 'AI 식별 리스크',
@@ -140,7 +147,7 @@ export class ConsultationResponseDto {
     description: 'AI 전체 분석 결과',
     example: { summary: '...', techStack: '...' },
   })
-  aiAnalysis?: any;
+  aiAnalysis?: Record<string, unknown> | null;
 
   @ApiProperty({
     description: '생성일시',
@@ -154,7 +161,7 @@ export class ConsultationResponseDto {
   })
   updatedAt: Date;
 
-  constructor(consultation: any) {
+  constructor(consultation: Partial<Consultation>) {
     Object.assign(this, consultation);
   }
 }

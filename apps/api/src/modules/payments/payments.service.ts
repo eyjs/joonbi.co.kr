@@ -14,8 +14,13 @@ import {
   PaymentWebhookDto,
   WebhookStatus,
 } from './dto';
-import { PaymentType, PaymentStatus, ProjectStatus } from '@prisma/client';
+import { Payment, PaymentType, PaymentStatus, ProjectStatus, Project, User } from '@prisma/client';
 import axios from 'axios';
+
+interface PaymentWithRelations extends Payment {
+  project?: Pick<Project, 'projectCode' | 'projectName'> | null;
+  user?: Pick<User, 'id' | 'email' | 'name'> | null;
+}
 
 @Injectable()
 export class PaymentsService {
@@ -34,7 +39,7 @@ export class PaymentsService {
     this.portOneMerchantId = this.configService.get('PORTONE_MERCHANT_ID');
   }
 
-  async findAll(userId: string): Promise<any[]> {
+  async findAll(userId: string): Promise<PaymentWithRelations[]> {
     const payments = await this.prisma.payment.findMany({
       where: { userId },
       include: {
@@ -51,7 +56,7 @@ export class PaymentsService {
     return payments;
   }
 
-  async findAllAdmin(): Promise<any[]> {
+  async findAllAdmin(): Promise<PaymentWithRelations[]> {
     const payments = await this.prisma.payment.findMany({
       include: {
         user: {
@@ -97,7 +102,7 @@ export class PaymentsService {
     };
   }
 
-  async complete(userId: string, dto: CompletePaymentDto): Promise<any> {
+  async complete(userId: string, dto: CompletePaymentDto): Promise<PaymentWithRelations> {
     const payment = await this.prisma.payment.findFirst({
       where: {
         id: dto.paymentId,
@@ -190,7 +195,7 @@ export class PaymentsService {
     return { success: true };
   }
 
-  private async handlePaymentComplete(payment: any): Promise<void> {
+  private async handlePaymentComplete(payment: PaymentWithRelations): Promise<void> {
     switch (payment.paymentType) {
       case PaymentType.CONSULTATION:
         await this.handleConsultationPayment(payment);
@@ -207,7 +212,7 @@ export class PaymentsService {
     }
   }
 
-  private async handleConsultationPayment(payment: any): Promise<void> {
+  private async handleConsultationPayment(payment: PaymentWithRelations): Promise<void> {
     await this.discordService.notifyPayment({
       type: '상담 비용 결제',
       userName: payment.user?.name || '고객',
@@ -216,7 +221,7 @@ export class PaymentsService {
     });
   }
 
-  private async handleContractPayment(payment: any): Promise<void> {
+  private async handleContractPayment(payment: PaymentWithRelations): Promise<void> {
     if (!payment.projectId) {
       return;
     }
@@ -238,7 +243,7 @@ export class PaymentsService {
     });
   }
 
-  private async handleFinalPayment(payment: any): Promise<void> {
+  private async handleFinalPayment(payment: PaymentWithRelations): Promise<void> {
     if (!payment.projectId) {
       return;
     }
@@ -260,7 +265,7 @@ export class PaymentsService {
     });
   }
 
-  private async handleExtraPayment(payment: any): Promise<void> {
+  private async handleExtraPayment(payment: PaymentWithRelations): Promise<void> {
     await this.discordService.notifyPayment({
       type: '추가 비용 결제',
       userName: payment.user?.name || '고객',
