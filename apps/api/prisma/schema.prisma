@@ -350,7 +350,13 @@ model Portfolio {
   displayType     PortfolioDisplay @default(ANONYMOUS)
   isPublic        Boolean          @default(false)
 
+  techStack       String[]
+  category        String?
+  completedAt     DateTime?
+  clientName      String?
+
   images          PortfolioImage[]
+  sections        PortfolioSection[]
 
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
@@ -365,12 +371,43 @@ enum PortfolioDisplay {
 model PortfolioImage {
   id              String    @id @default(uuid())
   portfolioId     String
-  portfolio       Portfolio @relation(fields: [portfolioId], references: [id])
+  portfolio       Portfolio @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
 
   imageUrl        String
   displayOrder    Int
 
   createdAt       DateTime  @default(now())
+}
+
+// 포트폴리오 콘텐츠 섹션 (순서 있는 블록 구조)
+model PortfolioSection {
+  id            String              @id @default(uuid())
+  portfolioId   String
+  portfolio     Portfolio           @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
+
+  sectionType   PortfolioSectionType
+  title         String?
+  displayOrder  Int
+
+  // sectionType별로 아래 중 하나만 사용
+  textContent   String?             // OVERVIEW, BRIEF 타입 — 마크다운 텍스트
+  videoUrl      String?             // VIDEO 타입 — GCS URL 또는 외부 임베드 URL
+  diagramCode   String?             // DIAGRAM 타입 — Mermaid DSL 원문
+  diagramKind   String?             // DIAGRAM 타입 — flowchart | sequence | erd | etc.
+  fileUrl       String?             // DOCUMENT 타입 — PDF/이미지 GCS URL
+  fileName      String?             // DOCUMENT 타입 — 원본 파일명
+
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+}
+
+enum PortfolioSectionType {
+  OVERVIEW
+  BRIEF
+  VIDEO
+  DIAGRAM
+  DOCUMENT
+  IMAGES
 }
 
 // ==================== 이벤트 ====================

@@ -36,6 +36,12 @@ export function Header() {
           >
             프로세스
           </Link>
+          <Link
+            href="/portfolio"
+            className="text-sm text-gray-300 hover:text-cyan-400 transition-colors"
+          >
+            포트폴리오
+          </Link>
           {isAuthenticated && (
             <Link
               href="/admin/dashboard"

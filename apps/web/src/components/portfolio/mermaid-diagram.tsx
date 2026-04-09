@@ -1,0 +1,95 @@
+'use client';
+
+import { useEffect, useRef, useState } from 'react';
+
+interface MermaidDiagramProps {
+  code: string;
+  diagramKind?: string;
+}
+
+/**
+ * Mermaid 다이어그램 렌더링 컴포넌트.
+ * Mermaid의 render() 메서드는 자체 DSL 파서를 통해 SVG를 생성하며,
+ * 임의의 HTML을 주입하지 않는다. 관리자만 Mermaid DSL을 입력할 수 있으므로
+ * XSS 위험이 없다. (관리자 전용 입력 -> Mermaid DSL 파서 -> SVG 출력)
+ */
+export function MermaidDiagram({ code, diagramKind }: MermaidDiagramProps): JSX.Element {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function renderDiagram(): Promise<void> {
+      try {
+        const mermaid = (await import('mermaid')).default;
+        mermaid.initialize({
+          startOnLoad: false,
+          theme: 'dark',
+          securityLevel: 'strict',
+          themeVariables: {
+            primaryColor: '#00d9ff',
+            primaryTextColor: '#ffffff',
+            primaryBorderColor: '#00d9ff',
+            lineColor: '#4a5568',
+            secondaryColor: '#1a202c',
+            tertiaryColor: '#2d3748',
+          },
+        });
+
+        if (!containerRef.current || !isMounted) return;
+
+        // Mermaid render()는 sanitized SVG를 생성하고 container에 삽입
+        const id = `mermaid-${Date.now()}`;
+        const { svg, bindFunctions } = await mermaid.render(id, code);
+
+        if (containerRef.current && isMounted) {
+          // Mermaid가 생성한 SVG DOM을 파싱하여 안전하게 삽입
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(svg, 'image/svg+xml');
+          const svgElement = doc.documentElement;
+
+          containerRef.current.replaceChildren();
+          containerRef.current.appendChild(
+            containerRef.current.ownerDocument.importNode(svgElement, true),
+          );
+
+          if (bindFunctions) {
+            bindFunctions(containerRef.current);
+          }
+          setError(null);
+        }
+      } catch (err) {
+        if (isMounted) {
+          setError(err instanceof Error ? err.message : 'Mermaid 렌더링 실패');
+        }
+      }
+    }
+
+    renderDiagram();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [code]);
+
+  if (error) {
+    return (
+      <div className="rounded-lg border border-red-500/30 bg-red-500/10 p-4">
+        <p className="text-sm text-red-400 mb-2">다이어그램 렌더링 오류</p>
+        <pre className="text-xs text-gray-400 overflow-x-auto">{code}</pre>
+      </div>
+    );
+  }
+
+  return (
+    <div className="rounded-lg bg-white/5 p-4 overflow-x-auto">
+      {diagramKind && (
+        <span className="text-xs text-gray-500 uppercase tracking-wider mb-2 block">
+          {diagramKind}
+        </span>
+      )}
+      <div ref={containerRef} className="flex justify-center" />
+    </div>
+  );
+}

@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { PortfolioDisplay } from '@prisma/client';
+import { PortfolioDisplay, PortfolioSectionType } from '@prisma/client';
 
 export class PortfolioImageDto {
   @ApiProperty({ description: '이미지 ID' })
@@ -13,6 +13,44 @@ export class PortfolioImageDto {
 
   @ApiProperty({ description: '생성 시각' })
   createdAt: Date;
+}
+
+export class PortfolioSectionResponseDto {
+  @ApiProperty({ description: '섹션 ID' })
+  id: string;
+
+  @ApiProperty({ description: '섹션 타입', enum: PortfolioSectionType })
+  sectionType: PortfolioSectionType;
+
+  @ApiPropertyOptional({ description: '섹션 제목' })
+  title?: string;
+
+  @ApiProperty({ description: '표시 순서' })
+  displayOrder: number;
+
+  @ApiPropertyOptional({ description: '마크다운 텍스트' })
+  textContent?: string;
+
+  @ApiPropertyOptional({ description: '동영상 URL' })
+  videoUrl?: string;
+
+  @ApiPropertyOptional({ description: 'Mermaid DSL 코드' })
+  diagramCode?: string;
+
+  @ApiPropertyOptional({ description: '다이어그램 종류' })
+  diagramKind?: string;
+
+  @ApiPropertyOptional({ description: '파일 URL' })
+  fileUrl?: string;
+
+  @ApiPropertyOptional({ description: '원본 파일명' })
+  fileName?: string;
+
+  @ApiProperty({ description: '생성 시각' })
+  createdAt: Date;
+
+  @ApiProperty({ description: '수정 시각' })
+  updatedAt: Date;
 }
 
 export class PortfolioResponseDto {
@@ -40,8 +78,23 @@ export class PortfolioResponseDto {
   @ApiProperty({ description: '공개 여부' })
   isPublic: boolean;
 
+  @ApiPropertyOptional({ description: '사용 기술 태그', type: [String] })
+  techStack?: string[];
+
+  @ApiPropertyOptional({ description: '업종/카테고리' })
+  category?: string;
+
+  @ApiPropertyOptional({ description: '프로젝트 완료일' })
+  completedAt?: Date;
+
+  @ApiPropertyOptional({ description: '클라이언트명' })
+  clientName?: string;
+
   @ApiPropertyOptional({ description: '이미지 목록', type: [PortfolioImageDto] })
   images?: PortfolioImageDto[];
+
+  @ApiPropertyOptional({ description: '섹션 목록', type: [PortfolioSectionResponseDto] })
+  sections?: PortfolioSectionResponseDto[];
 
   @ApiProperty({ description: '생성 시각' })
   createdAt: Date;

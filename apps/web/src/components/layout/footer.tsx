@@ -27,6 +27,12 @@ export function Footer() {
                 프로세스
               </Link>
               <Link
+                href="/portfolio"
+                className="text-gray-400 hover:text-[#00d9ff] transition-colors"
+              >
+                포트폴리오
+              </Link>
+              <Link
                 href="/consultation"
                 className="text-gray-400 hover:text-[#00d9ff] transition-colors"
               >
