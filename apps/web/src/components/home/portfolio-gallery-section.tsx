@@ -1,27 +1,35 @@
 import Link from 'next/link';
 
-const portfolioItems = [
-  {
-    title: '이커머스 플랫폼',
-    category: '웹',
-    techStack: ['Next.js', 'NestJS', 'PostgreSQL'],
-    description: '상품 관리부터 결제까지 원스톱 쇼핑몰 솔루션',
-  },
-  {
-    title: '업무 자동화 시스템',
-    category: '시스템',
-    techStack: ['Python', 'FastAPI', 'React'],
-    description: '반복 업무를 자동화하여 생산성을 3배 향상',
-  },
-  {
-    title: '모바일 예약 앱',
-    category: '앱',
-    techStack: ['React Native', 'Node.js', 'MongoDB'],
-    description: '실시간 예약과 알림 기능을 갖춘 모바일 앱',
-  },
-];
+interface Portfolio {
+  id: string;
+  title: string;
+  slug: string;
+  description: string;
+  thumbnailUrl?: string;
+  category?: string;
+  techStack: string[];
+}
 
-export function PortfolioGallerySection(): JSX.Element {
+async function getPortfolios(): Promise<Portfolio[]> {
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+
+  try {
+    const res = await fetch(`${apiUrl}/api/portfolios?page=1&limit=3`, {
+      cache: 'no-store',
+    });
+
+    if (!res.ok) return [];
+
+    const data = await res.json();
+    return data.data || [];
+  } catch {
+    return [];
+  }
+}
+
+export async function PortfolioGallerySection(): Promise<JSX.Element> {
+  const portfolios = await getPortfolios();
+
   return (
     <section id="services" className="section section-alt px-4">
       <div className="max-w-6xl mx-auto">
@@ -32,35 +40,49 @@ export function PortfolioGallerySection(): JSX.Element {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-6 mb-10">
-          {portfolioItems.map((item) => (
-            <div
-              key={item.title}
-              className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow"
-            >
-              <div className="aspect-video bg-gray-100 flex items-center justify-center">
-                <span className="text-gray-400 text-sm">{item.category}</span>
-              </div>
-              <div className="p-5">
-                <span className="text-xs font-medium text-blue-600 uppercase tracking-wider">
-                  {item.category}
-                </span>
-                <h3 className="text-lg font-bold text-gray-900 mt-1">{item.title}</h3>
-                <p className="text-sm text-gray-500 mt-2">{item.description}</p>
-                <div className="flex flex-wrap gap-1.5 mt-3">
-                  {item.techStack.map((tech) => (
-                    <span
-                      key={tech}
-                      className="badge text-xs"
-                    >
-                      {tech}
-                    </span>
-                  ))}
+        {portfolios.length > 0 ? (
+          <div className="grid md:grid-cols-3 gap-6 mb-10">
+            {portfolios.map((item) => (
+              <Link
+                key={item.id}
+                href={`/portfolio/${item.slug}`}
+                className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow"
+              >
+                <div className="aspect-video bg-gray-100 flex items-center justify-center overflow-hidden">
+                  {item.thumbnailUrl ? (
+                    <img
+                      src={item.thumbnailUrl}
+                      alt={item.title}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <span className="text-gray-400 text-sm">{item.category}</span>
+                  )}
                 </div>
-              </div>
-            </div>
-          ))}
-        </div>
+                <div className="p-5">
+                  {item.category && (
+                    <span className="text-xs font-medium text-blue-600 uppercase tracking-wider">
+                      {item.category}
+                    </span>
+                  )}
+                  <h3 className="text-lg font-bold text-gray-900 mt-1">{item.title}</h3>
+                  <p className="text-sm text-gray-500 mt-2 line-clamp-2">{item.description}</p>
+                  <div className="flex flex-wrap gap-1.5 mt-3">
+                    {item.techStack.map((tech) => (
+                      <span key={tech} className="badge text-xs">
+                        {tech}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-12 text-gray-400 mb-10">
+            포트폴리오를 준비 중입니다.
+          </div>
+        )}
 
         <div className="text-center">
           <Link

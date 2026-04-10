@@ -7,7 +7,9 @@ import { DashboardIntroSection } from '@/components/home/dashboard-intro-section
 import { TestimonialsSection } from '@/components/home/testimonials-section';
 import { ConsultationCtaSection } from '@/components/home/consultation-cta-section';
 
-export default function HomePage(): JSX.Element {
+export const dynamic = 'force-dynamic';
+
+export default async function HomePage(): Promise<JSX.Element> {
   return (
     <>
       <Header />
