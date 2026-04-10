@@ -37,8 +37,8 @@ GCS_KEY_FILE=/app/gcs-key.json
 # ===================
 DISCORD_WEBHOOK_URL=https://discordapp.com/api/webhooks/1469145847454368009/G7oK-uYATjvxxToYFVRgAr1f_OUtHLPyPSlG5ABbG7eiywb20Mli7n791YzkzceExGxp
 
-# Clawdbot User ID (멘션용)
-CLAWDBOT_USER_ID=1466191190419443723
+# 분석 에이전트 User ID (멘션용)
+# DEPRECATED: CLAWDBOT_USER_ID=1466191190419443723
 
 # ===================
 # Resend Email
@@ -105,7 +105,7 @@ MAX_FILE_SIZE=52428800
 # Discord (실제 웹훅)
 # ===================
 DISCORD_WEBHOOK_URL=https://discordapp.com/api/webhooks/1469145847454368009/G7oK-uYATjvxxToYFVRgAr1f_OUtHLPyPSlG5ABbG7eiywb20Mli7n791YzkzceExGxp
-CLAWDBOT_USER_ID=1466191190419443723
+# DEPRECATED: CLAWDBOT_USER_ID=1466191190419443723
 
 # ===================
 # Resend Email (테스트용)
@@ -182,7 +182,7 @@ docker-compose logs -f api
 ## ✅ 확인사항
 
 - [x] DISCORD_WEBHOOK_URL 설정됨
-- [x] CLAWDBOT_USER_ID 설정됨
+- [x] # DEPRECATED: CLAWDBOT_USER_ID 설정됨
 - [ ] JWT_SECRET 강력한 키로 변경 (프로덕션만)
 - [ ] INTERNAL_API_KEY 강력한 키로 변경 (프로덕션만)
 - [ ] RESEND_API_KEY 실제 키 입력

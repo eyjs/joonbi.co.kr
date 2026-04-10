@@ -17,7 +17,8 @@ AI 자동화로 분석부터 화면설계까지 30분 내 완료.
 | **Backend** | NestJS 10, Prisma, PostgreSQL 15 |
 | **Infrastructure** | Docker, Docker Compose, CloudFlare Tunnel |
 | **Deployment** | Frontend (Vercel), Backend (Docker + CloudFlare Tunnel) |
-| **Automation** | Discord Webhook, Clawdbot |
+| **Automation** | pgBoss (작업 큐), OpenAI GPT API (분석 에이전트) |
+| **Notifications** | Discord Webhook (관리자 알림) |
 
 ## 프로젝트 구조
 

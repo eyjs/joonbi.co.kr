@@ -110,12 +110,12 @@ apps/api/src/modules/internal/
 
 Swagger UI에서 확인 가능:
 - http://localhost:4000/api/docs
-- "Internal API (Clawdbot)" 태그로 구분됨
+- "Internal API (분석 에이전트)" 태그로 구분됨
 - API 키 인증 스키마 표시됨
 
 ## 다음 단계
 
-Clawdbot 구현 시 이 Internal API를 사용하여:
+분석 에이전트 구현 시 이 Internal API를 사용하여:
 1. 분석 대기 목록 조회
 2. 분석 시작 마킹
 3. 분석 결과 저장
