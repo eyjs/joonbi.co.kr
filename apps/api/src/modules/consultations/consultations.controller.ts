@@ -2,6 +2,7 @@ import {
   Controller,
   Get,
   Post,
+  Patch,
   Body,
   Param,
   UseGuards,
@@ -21,12 +22,16 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { ConsultationsService } from './consultations.service';
 import {
   CreateConsultationDto,
+  CreatePublicConsultationDto,
+  ConfirmSpecDto,
+  SubmitInfoDto,
   ConsultationResponseDto,
   ConsultationFileResponseDto,
   ConsultationDesignResponseDto,
 } from './dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { Public } from '../auth/decorators/public.decorator';
 import { AuthenticatedUser } from '../../common/types';
 
 @ApiTags('상담')
@@ -35,6 +40,76 @@ import { AuthenticatedUser } from '../../common/types';
 @ApiBearerAuth()
 export class ConsultationsController {
   constructor(private readonly consultationsService: ConsultationsService) {}
+
+  // ===== Public endpoints (no auth required) =====
+
+  @Public()
+  @Post('public')
+  @ApiOperation({ summary: '공개 상담 신청 (인증 불필요)' })
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    description: '상담 신청 성공',
+    type: ConsultationResponseDto,
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: '잘못된 요청 (설명 50자 미만 등)',
+  })
+  async createPublic(
+    @Body() dto: CreatePublicConsultationDto,
+  ): Promise<ConsultationResponseDto> {
+    return this.consultationsService.createPublic(dto);
+  }
+
+  @Public()
+  @Get('by-token/:token')
+  @ApiOperation({ summary: 'accessToken으로 상담 조회 (인증 불필요)' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: '상담 조회 성공',
+    type: ConsultationResponseDto,
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: '상담을 찾을 수 없습니다.',
+  })
+  async findByToken(
+    @Param('token') token: string,
+  ): Promise<ConsultationResponseDto> {
+    return this.consultationsService.findByAccessToken(token);
+  }
+
+  @Public()
+  @Patch('by-token/:token/confirm-spec')
+  @ApiOperation({ summary: '명세 확인 (인증 불필요)' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: '명세 확인 성공',
+    type: ConsultationResponseDto,
+  })
+  async confirmSpec(
+    @Param('token') token: string,
+    @Body() dto: ConfirmSpecDto,
+  ): Promise<ConsultationResponseDto> {
+    return this.consultationsService.confirmSpec(token, dto);
+  }
+
+  @Public()
+  @Patch('by-token/:token/submit-info')
+  @ApiOperation({ summary: '고객 정보 제출 (인증 불필요)' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: '정보 제출 성공',
+    type: ConsultationResponseDto,
+  })
+  async submitInfo(
+    @Param('token') token: string,
+    @Body() dto: SubmitInfoDto,
+  ): Promise<ConsultationResponseDto> {
+    return this.consultationsService.submitInfo(token, dto);
+  }
+
+  // ===== Authenticated endpoints (admin) =====
 
   @Get()
   @ApiOperation({ summary: '내 상담 목록 조회' })

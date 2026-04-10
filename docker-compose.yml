@@ -27,7 +27,7 @@ services:
       - NICE_CANCEL_URL=https://joonbi.co.kr/my/payments/cancel
       - KAKAO_REST_API_KEY=${KAKAO_REST_API_KEY}
       - KAKAO_SENDER_KEY=${KAKAO_SENDER_KEY}
-      - FRONTEND_URL=https://joonbi.co.kr
+      - FRONTEND_URL=https://joonbi-co-kr-web.vercel.app
       - BACKEND_URL=https://api.joonbi.co.kr
     volumes:
       - uploads:/data/uploads

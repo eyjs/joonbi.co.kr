@@ -18,7 +18,7 @@ export function ImageGallery({ images }: ImageGalleryProps): JSX.Element {
           <button
             key={`${image.imageUrl}-${image.displayOrder}`}
             type="button"
-            className="aspect-video rounded-lg overflow-hidden bg-white/5 cursor-pointer hover:ring-2 hover:ring-[var(--tech-neon-cyan)] transition-all focus:outline-none focus:ring-2 focus:ring-[var(--tech-neon-cyan)]"
+            className="aspect-video rounded-lg overflow-hidden bg-gray-100 cursor-pointer hover:ring-2 hover:ring-blue-600 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
             onClick={() => setSelectedIndex(index)}
             aria-label={`이미지 ${index + 1} 크게 보기`}
           >
@@ -34,14 +34,14 @@ export function ImageGallery({ images }: ImageGalleryProps): JSX.Element {
 
       {selectedIndex !== null && (
         <div
-          className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4"
+          className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4"
           role="dialog"
           aria-modal="true"
           aria-label="이미지 뷰어"
         >
           <button
             type="button"
-            className="absolute top-4 right-4 text-white text-3xl hover:text-gray-300 z-10 focus:outline-none focus:ring-2 focus:ring-white rounded"
+            className="absolute top-4 right-4 text-white text-3xl hover:text-gray-300 z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white rounded"
             onClick={() => setSelectedIndex(null)}
             aria-label="닫기"
           >
@@ -51,7 +51,7 @@ export function ImageGallery({ images }: ImageGalleryProps): JSX.Element {
           {selectedIndex > 0 && (
             <button
               type="button"
-              className="absolute left-4 text-white text-4xl hover:text-gray-300 focus:outline-none focus:ring-2 focus:ring-white rounded"
+              className="absolute left-4 text-white text-4xl hover:text-gray-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white rounded"
               onClick={() => setSelectedIndex(selectedIndex - 1)}
               aria-label="이전 이미지"
             >
@@ -62,7 +62,7 @@ export function ImageGallery({ images }: ImageGalleryProps): JSX.Element {
           {selectedIndex < sorted.length - 1 && (
             <button
               type="button"
-              className="absolute right-4 text-white text-4xl hover:text-gray-300 focus:outline-none focus:ring-2 focus:ring-white rounded"
+              className="absolute right-4 text-white text-4xl hover:text-gray-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white rounded"
               onClick={() => setSelectedIndex(selectedIndex + 1)}
               aria-label="다음 이미지"
             >

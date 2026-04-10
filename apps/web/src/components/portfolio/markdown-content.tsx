@@ -9,17 +9,17 @@ interface MarkdownContentProps {
 
 export function MarkdownContent({ content }: MarkdownContentProps): JSX.Element {
   return (
-    <div className="prose prose-invert prose-sm max-w-none
-      prose-headings:text-white prose-headings:font-bold
-      prose-p:text-gray-300 prose-p:leading-relaxed
-      prose-a:text-[var(--tech-neon-cyan)] prose-a:no-underline hover:prose-a:underline
-      prose-strong:text-white
-      prose-code:text-[var(--tech-neon-cyan)] prose-code:bg-white/5 prose-code:px-1 prose-code:rounded
-      prose-pre:bg-white/5 prose-pre:border prose-pre:border-white/10
-      prose-ul:text-gray-300 prose-ol:text-gray-300
-      prose-table:text-gray-300
-      prose-th:text-white prose-th:border-white/20
-      prose-td:border-white/10"
+    <div className="prose prose-sm max-w-none
+      prose-headings:text-gray-900 prose-headings:font-bold
+      prose-p:text-gray-600 prose-p:leading-relaxed
+      prose-a:text-blue-600 prose-a:no-underline hover:prose-a:underline
+      prose-strong:text-gray-900
+      prose-code:text-blue-600 prose-code:bg-gray-100 prose-code:px-1.5 prose-code:rounded
+      prose-pre:bg-gray-50 prose-pre:border prose-pre:border-gray-200
+      prose-ul:text-gray-600 prose-ol:text-gray-600
+      prose-table:text-gray-600
+      prose-th:text-gray-900 prose-th:border-gray-200
+      prose-td:border-gray-200"
     >
       <ReactMarkdown remarkPlugins={[remarkGfm]}>
         {content}

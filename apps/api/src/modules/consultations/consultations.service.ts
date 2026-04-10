@@ -6,6 +6,9 @@ import {
 import { PrismaService } from '../../prisma/prisma.service';
 import {
   CreateConsultationDto,
+  CreatePublicConsultationDto,
+  ConfirmSpecDto,
+  SubmitInfoDto,
   ConsultationResponseDto,
   ConsultationFileResponseDto,
   ConsultationDesignResponseDto,
@@ -23,6 +26,116 @@ export class ConsultationsService {
     private readonly prisma: PrismaService,
     private readonly discordService: DiscordService,
   ) {}
+
+  // ===== Public methods =====
+
+  async createPublic(
+    dto: CreatePublicConsultationDto,
+  ): Promise<ConsultationResponseDto> {
+    const projectName = dto.description.substring(0, 50).trim();
+
+    const consultation = await this.prisma.consultation.create({
+      data: {
+        // userId is null for public consultations
+        type: ConsultationType.ANALYSIS,
+        projectName,
+        description: dto.description,
+        referenceUrls: dto.referenceUrls || [],
+        budgetRange: dto.budgetRange || null,
+        status: ConsultationStatus.PENDING,
+        analysisStatus: AnalysisStatus.PENDING,
+        aiRisks: [],
+      },
+    });
+
+    try {
+      await this.discordService.requestFullAnalysis(consultation);
+    } catch {
+      // Discord notification failure should not block consultation creation
+    }
+
+    return new ConsultationResponseDto(consultation);
+  }
+
+  async findByAccessToken(token: string): Promise<ConsultationResponseDto> {
+    const consultation = await this.prisma.consultation.findFirst({
+      where: { accessToken: token },
+      include: {
+        files: true,
+        designs: true,
+      },
+    });
+
+    if (!consultation) {
+      throw new NotFoundException('상담을 찾을 수 없습니다.');
+    }
+
+    return new ConsultationResponseDto(consultation);
+  }
+
+  async confirmSpec(
+    token: string,
+    dto: ConfirmSpecDto,
+  ): Promise<ConsultationResponseDto> {
+    const consultation = await this.prisma.consultation.findFirst({
+      where: { accessToken: token },
+    });
+
+    if (!consultation) {
+      throw new NotFoundException('상담을 찾을 수 없습니다.');
+    }
+
+    const updated = await this.prisma.consultation.update({
+      where: { id: consultation.id },
+      data: {
+        status: ConsultationStatus.PROCESSING,
+        // Store customer comment in aiAnalysis if needed
+        ...(dto.customerComment && {
+          aiAnalysis: {
+            ...(typeof consultation.aiAnalysis === 'object' && consultation.aiAnalysis !== null
+              ? consultation.aiAnalysis
+              : {}),
+            customerComment: dto.customerComment,
+          },
+        }),
+      },
+    });
+
+    return new ConsultationResponseDto(updated);
+  }
+
+  async submitInfo(
+    token: string,
+    dto: SubmitInfoDto,
+  ): Promise<ConsultationResponseDto> {
+    const consultation = await this.prisma.consultation.findFirst({
+      where: { accessToken: token },
+    });
+
+    if (!consultation) {
+      throw new NotFoundException('상담을 찾을 수 없습니다.');
+    }
+
+    const updated = await this.prisma.consultation.update({
+      where: { id: consultation.id },
+      data: {
+        aiAnalysis: {
+          ...(typeof consultation.aiAnalysis === 'object' && consultation.aiAnalysis !== null
+            ? consultation.aiAnalysis
+            : {}),
+          customerName: dto.customerName,
+          customerEmail: dto.customerEmail,
+          customerPhone: dto.customerPhone,
+          companyName: dto.companyName || null,
+          businessNumber: dto.businessNumber || null,
+        },
+      },
+    });
+
+    return new ConsultationResponseDto(updated);
+  }
+
+  // ===== Authenticated methods =====
 
   async findAll(userId: string): Promise<ConsultationResponseDto[]> {
     const consultations = await this.prisma.consultation.findMany({

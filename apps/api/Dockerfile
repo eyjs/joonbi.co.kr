@@ -22,7 +22,8 @@ COPY . .
 
 # Prisma 클라이언트 생성 및 빌드
 RUN npx prisma generate --schema=./apps/api/prisma/schema.prisma
-RUN npm run build -w @joonbi/api
+RUN npm install -g @nestjs/cli
+RUN cd apps/api && nest build
 
 # 3. 실행 단계
 FROM base AS runner

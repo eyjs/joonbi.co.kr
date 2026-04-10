@@ -34,7 +34,6 @@ const config: Config = {
         accent: {
           DEFAULT: 'hsl(var(--accent))',
           foreground: 'hsl(var(--accent-foreground))',
-          red: '#D84315',
         },
         popover: {
           DEFAULT: 'hsl(var(--popover))',
@@ -44,18 +43,6 @@ const config: Config = {
           DEFAULT: 'hsl(var(--card))',
           foreground: 'hsl(var(--card-foreground))',
         },
-        cream: '#FAF8F5',
-        charcoal: '#1A1A1A',
-        'burnt-orange': '#E67E22',
-        'deep-teal': '#2C5F5D',
-        'warm-gray': '#8B7E74',
-        'light-tan': '#E8E3DC',
-        coral: {
-          '50': '#fff1f0',
-          '100': '#ffe0dd',
-          '500': '#FF6B4A',
-          '600': '#e85a3a',
-        },
       },
       borderRadius: {
         lg: 'var(--radius)',
@@ -63,8 +50,7 @@ const config: Config = {
         sm: 'calc(var(--radius) - 4px)',
       },
       fontFamily: {
-        display: ['var(--font-display)'],
-        korean: ['var(--font-korean)'],
+        sans: ['Pretendard', '-apple-system', 'BlinkMacSystemFont', 'system-ui', 'sans-serif'],
       },
     },
   },

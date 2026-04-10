@@ -36,8 +36,8 @@ enum Role {
 
 model Consultation {
   id              String             @id @default(uuid())
-  userId          String
-  user            User               @relation(fields: [userId], references: [id])
+  userId          String?
+  user            User?              @relation(fields: [userId], references: [id])
 
   // UUID 기반 접근 토큰 (로그인 없이 상담 결과 확인)
   accessToken     String?            @unique @default(uuid())
