@@ -2,7 +2,6 @@ import { Metadata } from 'next';
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
 import { PortfolioListClient } from '@/components/portfolio/portfolio-list-client';
-import type { PortfolioListResponse } from '@/types/portfolio';
 
 export const metadata: Metadata = {
   title: '포트폴리오 | 준비스튜디오',
@@ -13,29 +12,7 @@ export const metadata: Metadata = {
   },
 };
 
-export const dynamic = 'force-dynamic';
-
-async function getPortfolios(): Promise<PortfolioListResponse> {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
-
-  try {
-    const res = await fetch(`${apiUrl}/api/portfolios?page=1&limit=50`, {
-      cache: 'no-store',
-    });
-
-    if (!res.ok) {
-      return { data: [], meta: { total: 0, page: 1, limit: 50 } };
-    }
-
-    return res.json();
-  } catch {
-    return { data: [], meta: { total: 0, page: 1, limit: 50 } };
-  }
-}
-
-export default async function PortfolioListPage(): Promise<JSX.Element> {
-  const { data: portfolios } = await getPortfolios();
-
+export default function PortfolioListPage(): JSX.Element {
   return (
     <>
       <Header />
@@ -50,7 +27,7 @@ export default async function PortfolioListPage(): Promise<JSX.Element> {
               </p>
             </div>
 
-            <PortfolioListClient portfolios={portfolios} />
+            <PortfolioListClient />
           </div>
         </section>
       </main>

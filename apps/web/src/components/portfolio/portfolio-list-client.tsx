@@ -1,16 +1,23 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import type { Portfolio } from '@/types/portfolio';
 import { CategoryFilter } from './category-filter';
 
-interface PortfolioListClientProps {
-  portfolios: Portfolio[];
-}
-
-export function PortfolioListClient({ portfolios }: PortfolioListClientProps): JSX.Element {
+export function PortfolioListClient(): JSX.Element {
+  const [portfolios, setPortfolios] = useState<Portfolio[]>([]);
+  const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+
+  useEffect(() => {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+    fetch(`${apiUrl}/api/portfolios?page=1&limit=50`)
+      .then((res) => (res.ok ? res.json() : { data: [] }))
+      .then((json) => setPortfolios(json.data || []))
+      .catch(() => setPortfolios([]))
+      .finally(() => setLoading(false));
+  }, []);
 
   const categories = useMemo(() => {
     const cats = portfolios
@@ -23,6 +30,14 @@ export function PortfolioListClient({ portfolios }: PortfolioListClientProps): J
     if (!selectedCategory) return portfolios;
     return portfolios.filter((p) => p.category === selectedCategory);
   }, [portfolios, selectedCategory]);
+
+  if (loading) {
+    return (
+      <div className="text-center py-20">
+        <p className="text-gray-400">포트폴리오를 불러오는 중...</p>
+      </div>
+    );
+  }
 
   if (portfolios.length === 0) {
     return (
@@ -83,10 +98,7 @@ export function PortfolioListClient({ portfolios }: PortfolioListClientProps): J
               {portfolio.techStack && portfolio.techStack.length > 0 && (
                 <div className="flex flex-wrap gap-1.5 mt-3">
                   {portfolio.techStack.slice(0, 5).map((tech) => (
-                    <span
-                      key={tech}
-                      className="badge text-xs"
-                    >
+                    <span key={tech} className="badge text-xs">
                       {tech}
                     </span>
                   ))}

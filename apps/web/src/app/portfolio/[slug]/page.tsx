@@ -1,55 +1,47 @@
-import { Metadata } from 'next';
+'use client';
+
+import { useState, useEffect, use } from 'react';
 import { notFound } from 'next/navigation';
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
 import { PortfolioDetailClient } from '@/components/portfolio/portfolio-detail-client';
 import type { Portfolio } from '@/types/portfolio';
 
-export const dynamic = 'force-dynamic';
-
 interface PageProps {
   params: Promise<{ slug: string }>;
 }
 
-async function getPortfolio(slug: string): Promise<Portfolio | null> {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+export default function PortfolioDetailPage({ params }: PageProps): JSX.Element {
+  const { slug } = use(params);
+  const [portfolio, setPortfolio] = useState<Portfolio | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
-  try {
-    const res = await fetch(`${apiUrl}/api/portfolios/${slug}`, {
-      cache: 'no-store',
-    });
+  useEffect(() => {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+    fetch(`${apiUrl}/api/portfolios/${slug}`)
+      .then((res) => {
+        if (!res.ok) throw new Error('Not found');
+        return res.json();
+      })
+      .then((data) => setPortfolio(data))
+      .catch(() => setError(true))
+      .finally(() => setLoading(false));
+  }, [slug]);
 
-    if (!res.ok) return null;
-    return res.json();
-  } catch {
-    return null;
+  if (loading) {
+    return (
+      <>
+        <Header />
+        <main className="pt-16 min-h-screen bg-white flex items-center justify-center">
+          <p className="text-gray-400">포트폴리오를 불러오는 중...</p>
+        </main>
+        <Footer />
+      </>
+    );
   }
-}
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { slug } = await params;
-  const portfolio = await getPortfolio(slug);
-
-  if (!portfolio) {
-    return { title: '포트폴리오를 찾을 수 없습니다 | 준비스튜디오' };
-  }
-
-  return {
-    title: `${portfolio.title} | 준비스튜디오 포트폴리오`,
-    description: portfolio.description || `${portfolio.title} - 준비스튜디오 프로젝트 사례집`,
-    openGraph: {
-      title: `${portfolio.title} | 준비스튜디오 포트폴리오`,
-      description: portfolio.description || `${portfolio.title} - 준비스튜디오 프로젝트 사례집`,
-      images: portfolio.thumbnailUrl ? [{ url: portfolio.thumbnailUrl }] : undefined,
-    },
-  };
-}
-
-export default async function PortfolioDetailPage({ params }: PageProps): Promise<JSX.Element> {
-  const { slug } = await params;
-  const portfolio = await getPortfolio(slug);
-
-  if (!portfolio) {
+  if (error || !portfolio) {
     notFound();
   }
 

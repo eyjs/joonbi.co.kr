@@ -1,3 +1,6 @@
+'use client';
+
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 
 interface Portfolio {
@@ -10,25 +13,16 @@ interface Portfolio {
   techStack: string[];
 }
 
-async function getPortfolios(): Promise<Portfolio[]> {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+export function PortfolioGallerySection(): JSX.Element {
+  const [portfolios, setPortfolios] = useState<Portfolio[]>([]);
 
-  try {
-    const res = await fetch(`${apiUrl}/api/portfolios?page=1&limit=3`, {
-      cache: 'no-store',
-    });
-
-    if (!res.ok) return [];
-
-    const data = await res.json();
-    return data.data || [];
-  } catch {
-    return [];
-  }
-}
-
-export async function PortfolioGallerySection(): Promise<JSX.Element> {
-  const portfolios = await getPortfolios();
+  useEffect(() => {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+    fetch(`${apiUrl}/api/portfolios?page=1&limit=3`)
+      .then((res) => (res.ok ? res.json() : { data: [] }))
+      .then((json) => setPortfolios(json.data || []))
+      .catch(() => setPortfolios([]));
+  }, []);
 
   return (
     <section id="services" className="section section-alt px-4">
