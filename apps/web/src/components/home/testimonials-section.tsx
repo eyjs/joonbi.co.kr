@@ -8,7 +8,7 @@ const testimonials = [
 
 export function TestimonialsSection(): JSX.Element {
   return (
-    <section className="section px-6">
+    <section className="section">
       <div className="max-w-6xl mx-auto">
         {/* Testimonials */}
         <div className="text-center mb-10">

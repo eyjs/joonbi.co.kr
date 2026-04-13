@@ -11,7 +11,7 @@ export default function HomePage(): JSX.Element {
   return (
     <>
       <Header />
-      <main className="pt-16 min-h-screen bg-white">
+      <main className="pt-16 min-h-screen bg-white px-4 sm:px-6 lg:px-0">
         <HeroSection />
         <PortfolioGallerySection />
         <WorkProcessSection />
