@@ -68,6 +68,14 @@ export function ProjectHero({ portfolio }: ProjectHeroProps): JSX.Element {
               <dd>완료: {completedDate}</dd>
             </div>
           )}
+          {portfolio.priceRange && (
+            <div className="flex items-center gap-1">
+              <dt className="sr-only">비용</dt>
+              <dd className="font-semibold text-gray-900">
+                {portfolio.priceRange}만원
+              </dd>
+            </div>
+          )}
         </dl>
 
         {portfolio.techStack && portfolio.techStack.length > 0 && (

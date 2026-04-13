@@ -61,6 +61,7 @@ export interface Portfolio {
   summary?: string;
   duration?: string;
   heroVideoUrl?: string;
+  priceRange?: string;
   beforeItems?: BeforeAfterItem[];
   afterItems?: BeforeAfterItem[];
   milestones?: Milestone[];

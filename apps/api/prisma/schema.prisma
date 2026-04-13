@@ -359,6 +359,7 @@ model Portfolio {
   summary         String?
   duration        String?
   heroVideoUrl    String?
+  priceRange      String?
   beforeItems     Json?
   afterItems      Json?
   milestones      Json?
