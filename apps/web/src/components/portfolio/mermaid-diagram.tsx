@@ -25,15 +25,16 @@ export function MermaidDiagram({ code, diagramKind }: MermaidDiagramProps): JSX.
         const mermaid = (await import('mermaid')).default;
         mermaid.initialize({
           startOnLoad: false,
-          theme: 'dark',
+          theme: 'default',
           securityLevel: 'strict',
           themeVariables: {
-            primaryColor: '#00d9ff',
-            primaryTextColor: '#ffffff',
-            primaryBorderColor: '#00d9ff',
-            lineColor: '#4a5568',
-            secondaryColor: '#1a202c',
-            tertiaryColor: '#2d3748',
+            primaryColor: '#dbeafe',
+            primaryTextColor: '#1e293b',
+            primaryBorderColor: '#3b82f6',
+            lineColor: '#64748b',
+            secondaryColor: '#f1f5f9',
+            tertiaryColor: '#e2e8f0',
+            fontSize: '14px',
           },
         });
 
@@ -75,15 +76,15 @@ export function MermaidDiagram({ code, diagramKind }: MermaidDiagramProps): JSX.
 
   if (error) {
     return (
-      <div className="rounded-lg border border-red-500/30 bg-red-500/10 p-4">
-        <p className="text-sm text-red-400 mb-2">다이어그램 렌더링 오류</p>
-        <pre className="text-xs text-gray-400 overflow-x-auto">{code}</pre>
+      <div className="rounded-lg border border-red-200 bg-red-50 p-4">
+        <p className="text-sm text-red-600 mb-2">다이어그램 렌더링 오류</p>
+        <pre className="text-xs text-gray-500 overflow-x-auto">{code}</pre>
       </div>
     );
   }
 
   return (
-    <div className="rounded-lg bg-white/5 p-4 overflow-x-auto">
+    <div className="overflow-x-auto">
       {diagramKind && (
         <span className="text-xs text-gray-500 uppercase tracking-wider mb-2 block">
           {diagramKind}
