@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@joonbi/shared": "*",
+    "@tailwindcss/typography": "^0.5.19",
     "axios": "^1.6.7",
     "clsx": "^2.1.1",
     "lucide-react": "^0.563.0",

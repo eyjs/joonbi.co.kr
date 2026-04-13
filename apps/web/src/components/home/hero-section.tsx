@@ -26,16 +26,12 @@ export function HeroSection(): JSX.Element {
 
             <div className="flex gap-8 mt-12">
               <div>
-                <div className="text-2xl font-bold text-gray-900">50+</div>
-                <div className="text-sm text-gray-500">완료 프로젝트</div>
-              </div>
-              <div>
-                <div className="text-2xl font-bold text-gray-900">98%</div>
-                <div className="text-sm text-gray-500">고객 만족도</div>
-              </div>
-              <div>
-                <div className="text-2xl font-bold text-gray-900">3년+</div>
+                <div className="text-2xl font-bold text-gray-900">5년+</div>
                 <div className="text-sm text-gray-500">개발 경력</div>
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-gray-900">실시간</div>
+                <div className="text-sm text-gray-500">진행 현황 공유</div>
               </div>
             </div>
           </div>
