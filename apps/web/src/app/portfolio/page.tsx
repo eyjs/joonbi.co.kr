@@ -17,7 +17,7 @@ export default function PortfolioListPage(): JSX.Element {
     <>
       <Header />
       <main className="pt-16 min-h-screen bg-white">
-        <section className="pt-12 pb-16 px-4">
+        <section className="pt-12 pb-16 px-6">
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-12">
               <h1 className="heading-lg mb-4">프로젝트 사례집</h1>

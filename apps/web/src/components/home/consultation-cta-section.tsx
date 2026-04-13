@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 export function ConsultationCtaSection(): JSX.Element {
   return (
-    <section className="py-20 px-4 bg-blue-600">
+    <section className="py-20 px-6 bg-blue-600">
       <div className="max-w-4xl mx-auto text-center">
         <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
           프로젝트를 시작할 준비가 되셨나요?

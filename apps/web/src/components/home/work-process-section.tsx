@@ -43,7 +43,7 @@ const steps = [
 
 export function WorkProcessSection(): JSX.Element {
   return (
-    <section id="process" className="section px-4">
+    <section id="process" className="section px-6">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-12">
           <h2 className="heading-lg mb-4">작업 프로세스</h2>

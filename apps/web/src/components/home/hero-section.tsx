@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 export function HeroSection(): JSX.Element {
   return (
-    <section className="py-24 md:py-32 px-4 bg-white">
+    <section className="py-24 md:py-32 px-6 bg-white">
       <div className="max-w-6xl mx-auto">
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <div>
