@@ -1,4 +1,5 @@
-import axios, { AxiosResponse } from 'axios';
+import axios from 'axios';
+import { getStoredToken } from '@/stores/auth';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
@@ -11,7 +12,7 @@ const axiosInstance = axios.create({
 });
 
 axiosInstance.interceptors.request.use((config) => {
-  const token = localStorage.getItem('accessToken');
+  const token = getStoredToken('accessToken');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -27,21 +28,34 @@ axiosInstance.interceptors.response.use(
       originalRequest._retry = true;
 
       try {
-        const refreshToken = localStorage.getItem('refreshToken');
+        const refreshToken = getStoredToken('refreshToken');
+        if (!refreshToken) {
+          throw new Error('No refresh token');
+        }
+
         const response = await axios.post(`${API_URL}/api/auth/refresh`, {
           refreshToken,
         });
 
         const { accessToken } = response.data;
-        localStorage.setItem('accessToken', accessToken);
+
+        // Save new access token to the same storage that held the refresh token
+        const isInLocalStorage = localStorage.getItem('refreshToken') !== null;
+        if (isInLocalStorage) {
+          localStorage.setItem('accessToken', accessToken);
+        } else {
+          sessionStorage.setItem('accessToken', accessToken);
+        }
 
         originalRequest.headers.Authorization = `Bearer ${accessToken}`;
         return axiosInstance(originalRequest);
-      } catch (refreshError) {
+      } catch {
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
-        window.location.href = '/login';
-        return Promise.reject(refreshError);
+        sessionStorage.removeItem('accessToken');
+        sessionStorage.removeItem('refreshToken');
+        window.location.href = '/admin/login';
+        return Promise.reject(error);
       }
     }
 
@@ -49,11 +63,15 @@ axiosInstance.interceptors.response.use(
   }
 );
 
-// Create a typed API wrapper that unwraps the response
 export const api = {
-  get: <T>(url: string, config?: any): Promise<T> => axiosInstance.get(url, config),
-  post: <T>(url: string, data?: any, config?: any): Promise<T> => axiosInstance.post(url, data, config),
-  put: <T>(url: string, data?: any, config?: any): Promise<T> => axiosInstance.put(url, data, config),
-  patch: <T>(url: string, data?: any, config?: any): Promise<T> => axiosInstance.patch(url, data, config),
-  delete: <T>(url: string, config?: any): Promise<T> => axiosInstance.delete(url, config),
+  get: <T>(url: string, config?: Record<string, unknown>): Promise<T> =>
+    axiosInstance.get(url, config),
+  post: <T>(url: string, data?: unknown, config?: Record<string, unknown>): Promise<T> =>
+    axiosInstance.post(url, data, config),
+  put: <T>(url: string, data?: unknown, config?: Record<string, unknown>): Promise<T> =>
+    axiosInstance.put(url, data, config),
+  patch: <T>(url: string, data?: unknown, config?: Record<string, unknown>): Promise<T> =>
+    axiosInstance.patch(url, data, config),
+  delete: <T>(url: string, config?: Record<string, unknown>): Promise<T> =>
+    axiosInstance.delete(url, config),
 };

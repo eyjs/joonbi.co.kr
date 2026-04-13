@@ -31,25 +31,25 @@ export default function AdminPortfolioEditPage(): JSX.Element {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <p className="text-gray-500">로딩 중...</p>
+      <div className="flex items-center justify-center py-20">
+        <p className="text-gray-400 text-sm">로딩 중...</p>
       </div>
     );
   }
 
   if (error || !portfolio) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <p className="text-red-500">{error || '포트폴리오를 찾을 수 없습니다.'}</p>
+      <div className="flex items-center justify-center py-20">
+        <p className="text-red-400">{error || '포트폴리오를 찾을 수 없습니다.'}</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-4xl mx-auto mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">포트폴리오 수정</h1>
-        <p className="text-sm text-gray-500 mt-1">{portfolio.title}</p>
+    <div className="max-w-4xl mx-auto">
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold text-white">포트폴리오 수정</h1>
+        <p className="text-sm text-gray-400 mt-1">{portfolio.title}</p>
       </div>
       <PortfolioForm portfolio={portfolio} mode="edit" />
     </div>

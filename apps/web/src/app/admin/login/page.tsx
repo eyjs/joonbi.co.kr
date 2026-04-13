@@ -12,6 +12,7 @@ export default function AdminLoginPage() {
   const { setAuth } = useAuthStore();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -26,7 +27,7 @@ export default function AdminLoginPage() {
         password,
       } as LoginRequest);
 
-      setAuth(response.accessToken, response.refreshToken, response.user);
+      setAuth(response.accessToken, response.refreshToken, response.user, rememberMe);
       router.push('/admin/dashboard');
     } catch (err: unknown) {
       if (err instanceof Error) {
@@ -77,12 +78,25 @@ export default function AdminLoginPage() {
               <input
                 id="password"
                 type="password"
-                placeholder="••••••••"
+                placeholder="********"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 className="flex h-10 w-full rounded-md border border-gray-600 bg-gray-700 px-3 py-2 text-sm text-white placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
               />
+            </div>
+
+            <div className="flex items-center gap-2">
+              <input
+                id="rememberMe"
+                type="checkbox"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+                className="w-4 h-4 rounded border-gray-600 bg-gray-700 text-blue-600 focus:ring-blue-500 focus:ring-offset-gray-800"
+              />
+              <label htmlFor="rememberMe" className="text-sm text-gray-400 select-none cursor-pointer">
+                로그인 상태 유지 (7일)
+              </label>
             </div>
           </div>
 
