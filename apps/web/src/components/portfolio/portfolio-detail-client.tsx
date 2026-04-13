@@ -15,54 +15,68 @@ interface StepDefinition {
   sectionTypes: PortfolioSectionType[];
 }
 
-const STEP_DEFINITIONS: StepDefinition[] = [
-  { number: 1, label: 'Before/After', sectionTypes: ['BEFORE_AFTER'] },
-  { number: 2, label: '솔루션', sectionTypes: ['BRIEF', 'OVERVIEW'] },
-  { number: 3, label: '결과', sectionTypes: ['VIDEO', 'IMAGES', 'DOCUMENT', 'SCREENSHOT'] },
-  { number: 4, label: '아키텍처', sectionTypes: ['DIAGRAM'] },
-];
+const DEFAULT_STEP_LABELS = ['과제', '솔루션', '결과', '아키텍처'];
 
-function groupSectionsByStep(sections: PortfolioSection[]): Map<number, PortfolioSection[]> {
+function buildStepsFromSections(
+  portfolio: Portfolio,
+  sections: PortfolioSection[],
+): { steps: StepDefinition[]; sectionsByStep: Map<number, PortfolioSection[]> } {
   const sorted = [...sections].sort((a, b) => a.displayOrder - b.displayOrder);
-  const map = new Map<number, PortfolioSection[]>();
+  const sectionsByStep = new Map<number, PortfolioSection[]>();
+
+  // 섹션의 title로 스텝 라벨을 결정, 같은 title은 같은 스텝으로 묶음
+  const titleToStep = new Map<string, number>();
+  let stepCounter = 0;
 
   for (const section of sorted) {
-    const step = STEP_DEFINITIONS.find((s) =>
-      s.sectionTypes.includes(section.sectionType)
-    );
-    if (step) {
-      const existing = map.get(step.number) || [];
-      existing.push(section);
-      map.set(step.number, existing);
+    const title = section.title || `섹션 ${section.displayOrder}`;
+    let stepNum = titleToStep.get(title);
+
+    if (stepNum === undefined) {
+      stepCounter++;
+      stepNum = stepCounter;
+      titleToStep.set(title, stepNum);
+    }
+
+    const existing = sectionsByStep.get(stepNum) || [];
+    existing.push(section);
+    sectionsByStep.set(stepNum, existing);
+  }
+
+  // Before/After 데이터가 있으면 맨 앞에 스텝 추가
+  const hasPortfolioBA =
+    portfolio.beforeItems &&
+    portfolio.beforeItems.length > 0 &&
+    portfolio.afterItems &&
+    portfolio.afterItems.length > 0;
+
+  const steps: StepDefinition[] = [];
+
+  if (hasPortfolioBA) {
+    // 모든 기존 스텝 번호를 +1 shift
+    const shifted = new Map<number, PortfolioSection[]>();
+    for (const [num, secs] of sectionsByStep) {
+      shifted.set(num + 1, secs);
+    }
+    sectionsByStep.clear();
+    for (const [num, secs] of shifted) {
+      sectionsByStep.set(num, secs);
+    }
+
+    steps.push({ number: 1, label: 'Before/After', sectionTypes: [] });
+
+    for (const [title, _origNum] of titleToStep) {
+      const newNum = _origNum + 1;
+      steps.push({ number: newNum, label: title, sectionTypes: [] });
+    }
+  } else {
+    for (const [title, num] of titleToStep) {
+      steps.push({ number: num, label: title, sectionTypes: [] });
     }
   }
 
-  return map;
-}
-
-function getAvailableSteps(
-  portfolio: Portfolio,
-  sectionsByStep: Map<number, PortfolioSection[]>,
-): StepDefinition[] {
-  return STEP_DEFINITIONS.filter((s) => {
-    // Step 1 is available if there are BA sections or portfolio-level beforeItems/afterItems
-    if (s.number === 1) {
-      const hasSections = sectionsByStep.has(s.number);
-      const hasPortfolioBA =
-        portfolio.beforeItems &&
-        portfolio.beforeItems.length > 0 &&
-        portfolio.afterItems &&
-        portfolio.afterItems.length > 0;
-      return hasSections || hasPortfolioBA;
-    }
-    // Step 4 is available if there are diagram sections or milestones
-    if (s.number === 4) {
-      const hasSections = sectionsByStep.has(s.number);
-      const hasMilestones = portfolio.milestones && portfolio.milestones.length > 0;
-      return hasSections || hasMilestones;
-    }
-    return sectionsByStep.has(s.number);
-  });
+  steps.sort((a, b) => a.number - b.number);
+  return { steps, sectionsByStep };
 }
 
 interface PortfolioDetailClientProps {
@@ -73,8 +87,10 @@ export function PortfolioDetailClient({ portfolio }: PortfolioDetailClientProps)
   const [activeStep, setActiveStep] = useState(1);
   const stepRefs = useRef<Map<number, HTMLDivElement>>(new Map());
 
-  const sectionsByStep = groupSectionsByStep(portfolio.sections);
-  const availableSteps = getAvailableSteps(portfolio, sectionsByStep);
+  const { steps: availableSteps, sectionsByStep } = buildStepsFromSections(
+    portfolio,
+    portfolio.sections,
+  );
 
   const setStepRef = useCallback((stepNumber: number, el: HTMLDivElement | null) => {
     if (el) {
