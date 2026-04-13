@@ -81,7 +81,7 @@ export function PortfolioDetailClient({ portfolio }: PortfolioDetailClientProps)
 
   return (
     <article className="pb-16">
-      <div className="max-w-4xl mx-auto px-4">
+      <div className="max-w-4xl mx-auto px-5 md:px-4">
         {/* Project Hero */}
         <ProjectHero portfolio={portfolio} />
 
