@@ -101,17 +101,23 @@ export function Timeline({ milestones }: TimelineProps): JSX.Element {
         {/* x축 날짜 */}
         <div className="flex items-center gap-3 mt-2">
           <div className="w-44 flex-shrink-0" />
-          <div className="flex-1 relative h-6">
+          <div className="flex-1 relative h-6 overflow-visible">
             <div className="absolute inset-x-0 top-0 h-px bg-gray-200" />
-            {axisTicks.map((tick, i) => (
-              <div
-                key={i}
-                className="absolute text-[10px] text-gray-400 -translate-x-1/2"
-                style={{ left: `${tick.offset}%`, top: '4px' }}
-              >
-                {tick.label}
-              </div>
-            ))}
+            {axisTicks.map((tick, i) => {
+              const isLast = i === axisTicks.length - 1;
+              const isFirst = i === 0;
+              return (
+                <div
+                  key={i}
+                  className={`absolute text-[10px] text-gray-400 whitespace-nowrap ${
+                    isLast ? '-translate-x-full' : isFirst ? '' : '-translate-x-1/2'
+                  }`}
+                  style={{ left: `${tick.offset}%`, top: '4px' }}
+                >
+                  {tick.label}
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>

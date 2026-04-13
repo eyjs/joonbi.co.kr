@@ -21,13 +21,8 @@ export function BeforeAfter({ beforeItems, afterItems }: BeforeAfterProps): JSX.
         </h3>
         <ul className="space-y-3" aria-label="기존 문제점">
           {beforeItems.map((item, index) => (
-            <li key={index} className="flex items-start gap-3">
-              <span
-                className="flex-shrink-0 w-6 h-6 flex items-center justify-center rounded-full bg-red-100 text-red-600 text-xs font-bold"
-                aria-hidden="true"
-              >
-                {item.icon}
-              </span>
+            <li key={index} className="flex items-start gap-2">
+              <span className="flex-shrink-0 text-red-400" aria-hidden="true">✕</span>
               <span className="text-sm text-gray-700 leading-relaxed">{item.text}</span>
             </li>
           ))}
@@ -41,13 +36,8 @@ export function BeforeAfter({ beforeItems, afterItems }: BeforeAfterProps): JSX.
         </h3>
         <ul className="space-y-3" aria-label="개선 결과">
           {afterItems.map((item, index) => (
-            <li key={index} className="flex items-start gap-3">
-              <span
-                className="flex-shrink-0 w-6 h-6 flex items-center justify-center rounded-full bg-blue-100 text-blue-600 text-xs font-bold"
-                aria-hidden="true"
-              >
-                {item.icon}
-              </span>
+            <li key={index} className="flex items-start gap-2">
+              <span className="flex-shrink-0 text-blue-500" aria-hidden="true">✓</span>
               <span className="text-sm text-gray-700 leading-relaxed">{item.text}</span>
             </li>
           ))}
