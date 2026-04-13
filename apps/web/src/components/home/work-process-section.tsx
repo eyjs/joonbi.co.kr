@@ -60,7 +60,7 @@ export function WorkProcessSection(): JSX.Element {
                 <div className="hidden md:block absolute top-10 left-[60%] w-[80%] h-[2px] bg-gray-200" />
               )}
 
-              <div className="relative z-10">
+              <div className="relative z-10 p-4">
                 <div className="w-20 h-20 rounded-full bg-blue-50 flex items-center justify-center mx-auto mb-4 text-blue-600">
                   {step.icon}
                 </div>
