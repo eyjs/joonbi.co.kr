@@ -1,23 +1,20 @@
 'use client';
 
-import { useState, useEffect, use } from 'react';
-import { notFound } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import { useParams } from 'next/navigation';
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
 import { PortfolioDetailClient } from '@/components/portfolio/portfolio-detail-client';
 import type { Portfolio } from '@/types/portfolio';
 
-interface PageProps {
-  params: Promise<{ slug: string }>;
-}
-
-export default function PortfolioDetailPage({ params }: PageProps): JSX.Element {
-  const { slug } = use(params);
+export default function PortfolioDetailPage(): JSX.Element {
+  const { slug } = useParams<{ slug: string }>();
   const [portfolio, setPortfolio] = useState<Portfolio | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
   useEffect(() => {
+    if (!slug) return;
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
     fetch(`${apiUrl}/api/portfolios/${slug}`)
       .then((res) => {
@@ -42,7 +39,15 @@ export default function PortfolioDetailPage({ params }: PageProps): JSX.Element 
   }
 
   if (error || !portfolio) {
-    notFound();
+    return (
+      <>
+        <Header />
+        <main className="pt-16 min-h-screen bg-white flex items-center justify-center">
+          <p className="text-gray-500">포트폴리오를 찾을 수 없습니다.</p>
+        </main>
+        <Footer />
+      </>
+    );
   }
 
   return (
