@@ -2,7 +2,7 @@
 
 import { useEffect, useState, type ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuthStore } from '@/stores/auth';
+import { useAuthStore, getStoredToken } from '@/stores/auth';
 import { api } from '@/lib/api';
 import type { AuthResponse } from '@/types/auth';
 
@@ -12,19 +12,22 @@ interface AuthProviderProps {
 
 export function AuthProvider({ children }: AuthProviderProps): JSX.Element | null {
   const router = useRouter();
-  const { isAuthenticated, setAuth } = useAuthStore();
+  const { isAuthenticated, hasHydrated, setAuth } = useAuthStore();
   const [isChecking, setIsChecking] = useState(true);
 
   useEffect(() => {
-    async function checkAuth(): Promise<void> {
-      if (isAuthenticated) {
-        setIsChecking(false);
-        return;
-      }
+    // Wait for Zustand persist to finish hydrating from storage
+    if (!hasHydrated) return;
 
-      const refreshToken =
-        localStorage.getItem('refreshToken') ||
-        sessionStorage.getItem('refreshToken');
+    // If hydration restored a valid auth state, skip the refresh call
+    if (isAuthenticated) {
+      setIsChecking(false);
+      return;
+    }
+
+    // Hydration completed but no auth state — try refresh token from storage
+    async function tryRefresh(): Promise<void> {
+      const refreshToken = getStoredToken('refreshToken');
 
       if (!refreshToken) {
         router.replace('/admin/login');
@@ -36,12 +39,12 @@ export function AuthProvider({ children }: AuthProviderProps): JSX.Element | nul
           refreshToken,
         });
 
-        const isRemembered = localStorage.getItem('refreshToken') !== null;
+        const remembered = localStorage.getItem('refreshToken') !== null;
         setAuth(
           response.accessToken,
           response.refreshToken,
           response.user,
-          isRemembered,
+          remembered,
         );
         setIsChecking(false);
       } catch {
@@ -49,10 +52,11 @@ export function AuthProvider({ children }: AuthProviderProps): JSX.Element | nul
       }
     }
 
-    checkAuth();
-  }, [isAuthenticated, router, setAuth]);
+    tryRefresh();
+  }, [hasHydrated, isAuthenticated, router, setAuth]);
 
-  if (isChecking && !isAuthenticated) {
+  // Still waiting for hydration or auth check
+  if (!hasHydrated || (isChecking && !isAuthenticated)) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#0f0f23' }}>
         <div className="flex flex-col items-center gap-3">

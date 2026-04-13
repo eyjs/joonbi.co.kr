@@ -1,12 +1,26 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe, Logger } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import * as express from 'express';
+import * as path from 'path';
 import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 
 async function bootstrap(): Promise<void> {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
   const logger = new Logger('Bootstrap');
+
+  // Serve uploaded files at /uploads/* before setting the global API prefix.
+  // UPLOAD_PATH defaults to /data/uploads in Docker (see docker-compose.yml).
+  const uploadPath = process.env.UPLOAD_PATH;
+  if (uploadPath) {
+    app.use('/uploads', express.static(path.resolve(uploadPath), {
+      maxAge: '7d',
+      immutable: true,
+    }));
+    logger.log(`Static file serving enabled: /uploads → ${uploadPath}`);
+  }
 
   app.setGlobalPrefix('api');
 

@@ -242,6 +242,32 @@ export class ConsultationsService {
     return designs.map((d) => new ConsultationDesignResponseDto(d));
   }
 
+  // ===== Admin methods (no userId filter) =====
+
+  async findAllAdmin(): Promise<ConsultationResponseDto[]> {
+    const consultations = await this.prisma.consultation.findMany({
+      orderBy: { createdAt: 'desc' },
+    });
+
+    return consultations.map((c) => new ConsultationResponseDto(c));
+  }
+
+  async findByIdAdmin(id: string): Promise<ConsultationResponseDto> {
+    const consultation = await this.prisma.consultation.findUnique({
+      where: { id },
+      include: {
+        files: true,
+        designs: true,
+      },
+    });
+
+    if (!consultation) {
+      throw new NotFoundException('상담을 찾을 수 없습니다.');
+    }
+
+    return new ConsultationResponseDto(consultation);
+  }
+
   async canAccessConsultation(
     consultationId: string,
     userId: string,

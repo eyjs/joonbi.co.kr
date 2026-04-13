@@ -1,6 +1,7 @@
 import { Injectable, BadRequestException, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Storage } from '@google-cloud/storage';
+import * as fs from 'fs/promises';
+import * as path from 'path';
 
 interface UploadedFileInfo {
   url: string;
@@ -22,14 +23,17 @@ const ALLOWED_MIME_TYPES: Record<string, string[]> = {
 @Injectable()
 export class PortfolioUploadService {
   private readonly logger = new Logger(PortfolioUploadService.name);
-  private storage: Storage;
-  private bucketName: string;
+  private readonly uploadPath: string | null;
+  private readonly backendUrl: string;
+
+  // GCS fallback — lazily initialized only when needed
+  private gcsStorage: unknown | null = null;
+  private gcsBucketName: string;
 
   constructor(private readonly configService: ConfigService) {
-    const keyFilename = this.configService.get<string>('GCS_KEY_FILE', 'gcs-key.json');
-    this.bucketName = this.configService.get<string>('GCS_BUCKET', 'joonbi-portfolio');
-
-    this.storage = new Storage({ keyFilename });
+    this.uploadPath = this.configService.get<string>('UPLOAD_PATH', '') || null;
+    this.backendUrl = this.configService.get<string>('BACKEND_URL', 'http://localhost:4000');
+    this.gcsBucketName = this.configService.get<string>('GCS_BUCKET', 'joonbi-portfolio');
   }
 
   async uploadFile(
@@ -42,28 +46,88 @@ export class PortfolioUploadService {
 
     const sanitizedName = file.originalname.replace(/[^a-zA-Z0-9._-]/g, '_');
     const timestamp = Date.now();
-    const filePath = `portfolios/${portfolioId}/${sectionType.toLowerCase()}/${timestamp}-${sanitizedName}`;
+    const relativePath = `portfolios/${portfolioId}/${sectionType.toLowerCase()}/${timestamp}-${sanitizedName}`;
 
-    const bucket = this.storage.bucket(this.bucketName);
-    const blob = bucket.file(filePath);
+    // Local filesystem upload (primary)
+    if (this.uploadPath) {
+      return this.uploadToLocal(file, relativePath);
+    }
 
-    await blob.save(file.buffer, {
-      contentType: file.mimetype,
-      metadata: {
-        originalName: file.originalname,
-      },
-    });
+    // GCS fallback
+    return this.uploadToGcs(file, relativePath);
+  }
 
-    await blob.makePublic();
+  private async uploadToLocal(
+    file: Express.Multer.File,
+    relativePath: string,
+  ): Promise<UploadedFileInfo> {
+    const fullPath = path.join(this.uploadPath!, relativePath);
+    const directory = path.dirname(fullPath);
 
-    const url = `https://storage.googleapis.com/${this.bucketName}/${filePath}`;
+    await fs.mkdir(directory, { recursive: true });
+    await fs.writeFile(fullPath, file.buffer);
 
-    this.logger.log(`File uploaded: ${filePath}`);
+    // URL served by NestJS static file serving at /uploads/*
+    const url = `${this.backendUrl}/uploads/${relativePath}`;
+
+    this.logger.log(`File uploaded (local): ${relativePath}`);
 
     return {
       url,
       fileName: file.originalname,
     };
+  }
+
+  private async uploadToGcs(
+    file: Express.Multer.File,
+    relativePath: string,
+  ): Promise<UploadedFileInfo> {
+    try {
+      const storage = await this.getGcsStorage();
+      if (!storage) {
+        throw new Error('GCS is not configured and UPLOAD_PATH is not set');
+      }
+
+      const bucket = (storage as { bucket: (name: string) => { file: (path: string) => { save: (buffer: Buffer, opts: Record<string, unknown>) => Promise<void>; makePublic: () => Promise<void> } } }).bucket(this.gcsBucketName);
+      const blob = bucket.file(relativePath);
+
+      await blob.save(file.buffer, {
+        contentType: file.mimetype,
+        metadata: { originalName: file.originalname },
+      });
+
+      await blob.makePublic();
+
+      const url = `https://storage.googleapis.com/${this.gcsBucketName}/${relativePath}`;
+
+      this.logger.log(`File uploaded (GCS): ${relativePath}`);
+
+      return {
+        url,
+        fileName: file.originalname,
+      };
+    } catch (error) {
+      this.logger.error('GCS upload failed', error);
+      throw new BadRequestException('파일 업로드에 실패했습니다. 스토리지 설정을 확인하세요.');
+    }
+  }
+
+  /**
+   * Lazily initialize GCS Storage to avoid import errors
+   * when @google-cloud/storage is not installed.
+   */
+  private async getGcsStorage(): Promise<unknown | null> {
+    if (this.gcsStorage) return this.gcsStorage;
+
+    try {
+      const { Storage } = await import('@google-cloud/storage');
+      const keyFilename = this.configService.get<string>('GCS_KEY_FILE', 'gcs-key.json');
+      this.gcsStorage = new Storage({ keyFilename });
+      return this.gcsStorage;
+    } catch {
+      this.logger.warn('GCS SDK not available — falling back is not possible without UPLOAD_PATH');
+      return null;
+    }
   }
 
   private getFileCategory(sectionType: string): string {

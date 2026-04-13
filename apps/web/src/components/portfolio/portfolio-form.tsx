@@ -6,6 +6,7 @@ import { api } from '@/lib/api';
 import type { Portfolio, PortfolioSection, PortfolioSectionType } from '@/types/portfolio';
 import { SectionEditor } from './section-editor';
 import { ImageUploader } from '@/components/admin/image-uploader';
+import { VideoUploader } from '@/components/admin/video-uploader';
 
 interface PortfolioFormProps {
   portfolio?: Portfolio;
@@ -444,7 +445,12 @@ export function PortfolioForm({ portfolio, mode }: PortfolioFormProps): JSX.Elem
               />
             </div>
             <div>
-              <label htmlFor="heroVideoUrl" className={LABEL_CLASS}>대표 영상 URL</label>
+              <VideoUploader
+                label="대표 영상"
+                currentUrl={form.heroVideoUrl || undefined}
+                onUpload={(url) => setForm((prev) => ({ ...prev, heroVideoUrl: url }))}
+              />
+              <label htmlFor="heroVideoUrl" className={`${LABEL_CLASS} mt-2`}>대표 영상 URL (직접 입력)</label>
               <input
                 id="heroVideoUrl"
                 name="heroVideoUrl"
@@ -452,7 +458,7 @@ export function PortfolioForm({ portfolio, mode }: PortfolioFormProps): JSX.Elem
                 value={form.heroVideoUrl}
                 onChange={handleChange}
                 className={INPUT_CLASS}
-                placeholder="https://youtube.com/watch?v=..."
+                placeholder="업로드하거나 URL 직접 입력"
               />
             </div>
           </div>
