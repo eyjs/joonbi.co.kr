@@ -86,7 +86,19 @@
   }
 
   .section {
-    padding: 80px 0;
+    padding: 80px 20px;
+  }
+
+  @media (min-width: 640px) {
+    .section {
+      padding: 80px 24px;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .section {
+      padding: 80px 0;
+    }
   }
 
   .section-alt {
