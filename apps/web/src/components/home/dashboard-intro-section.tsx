@@ -30,7 +30,7 @@ export function DashboardIntroSection(): JSX.Element {
   ];
 
   return (
-    <section className="section section-alt">
+    <section className="section">
       <div className="max-w-6xl mx-auto">
         <div className="grid md:grid-cols-2 gap-12 items-center">
           {/* Mockup */}

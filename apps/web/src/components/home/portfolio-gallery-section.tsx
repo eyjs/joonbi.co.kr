@@ -25,7 +25,7 @@ export function PortfolioGallerySection(): JSX.Element {
   }, []);
 
   return (
-    <section id="services" className="section section-alt">
+    <section id="services" className="section">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-12">
           <h2 className="heading-lg mb-4">프로젝트 사례</h2>
