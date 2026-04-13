@@ -8,6 +8,8 @@ interface ImageUploaderProps {
   currentUrl?: string;
   accept?: string;
   label?: string;
+  portfolioId?: string;
+  sectionType?: string;
 }
 
 interface UploadResponse {
@@ -19,6 +21,8 @@ export function ImageUploader({
   currentUrl,
   accept = 'image/*',
   label = '이미지 업로드',
+  portfolioId = '',
+  sectionType = 'OVERVIEW',
 }: ImageUploaderProps): JSX.Element {
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -35,8 +39,11 @@ export function ImageUploader({
     formData.append('file', file);
 
     try {
+      const params = new URLSearchParams();
+      if (portfolioId) params.set('portfolioId', portfolioId);
+      params.set('sectionType', sectionType);
       const response = await api.post<UploadResponse>(
-        '/api/admin/portfolios/upload',
+        `/api/admin/portfolios/upload?${params.toString()}`,
         formData,
         {
           headers: { 'Content-Type': 'multipart/form-data' },
