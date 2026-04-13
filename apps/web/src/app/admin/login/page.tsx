@@ -10,8 +10,15 @@ import type { LoginRequest, AuthResponse } from '@/types/auth';
 export default function AdminLoginPage() {
   const router = useRouter();
   const { setAuth } = useAuthStore();
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState(() => {
+    if (typeof window !== 'undefined') return localStorage.getItem('savedEmail') || '';
+    return '';
+  });
   const [password, setPassword] = useState('');
+  const [saveId, setSaveId] = useState(() => {
+    if (typeof window !== 'undefined') return localStorage.getItem('savedEmail') !== null;
+    return false;
+  });
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -27,6 +34,11 @@ export default function AdminLoginPage() {
         password,
       } as LoginRequest);
 
+      if (saveId) {
+        localStorage.setItem('savedEmail', email);
+      } else {
+        localStorage.removeItem('savedEmail');
+      }
       setAuth(response.accessToken, response.refreshToken, response.user, rememberMe);
       router.push('/admin/dashboard');
     } catch (err: unknown) {
@@ -86,17 +98,31 @@ export default function AdminLoginPage() {
               />
             </div>
 
-            <div className="flex items-center gap-2">
-              <input
-                id="rememberMe"
-                type="checkbox"
-                checked={rememberMe}
-                onChange={(e) => setRememberMe(e.target.checked)}
-                className="w-4 h-4 rounded border-gray-600 bg-gray-700 text-blue-600 focus:ring-blue-500 focus:ring-offset-gray-800"
-              />
-              <label htmlFor="rememberMe" className="text-sm text-gray-400 select-none cursor-pointer">
-                로그인 상태 유지 (7일)
-              </label>
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <input
+                  id="saveId"
+                  type="checkbox"
+                  checked={saveId}
+                  onChange={(e) => setSaveId(e.target.checked)}
+                  className="w-4 h-4 rounded border-gray-600 bg-gray-700 text-blue-600 focus:ring-blue-500 focus:ring-offset-gray-800"
+                />
+                <label htmlFor="saveId" className="text-sm text-gray-400 select-none cursor-pointer">
+                  아이디 저장
+                </label>
+              </div>
+              <div className="flex items-center gap-2">
+                <input
+                  id="rememberMe"
+                  type="checkbox"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                  className="w-4 h-4 rounded border-gray-600 bg-gray-700 text-blue-600 focus:ring-blue-500 focus:ring-offset-gray-800"
+                />
+                <label htmlFor="rememberMe" className="text-sm text-gray-400 select-none cursor-pointer">
+                  로그인 상태 유지 (7일)
+                </label>
+              </div>
             </div>
           </div>
 
