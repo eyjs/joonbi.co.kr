@@ -1,82 +1,44 @@
 'use client';
 
 import { useRef, useState, useEffect, useCallback } from 'react';
-import type { Portfolio, PortfolioSection, PortfolioSectionType } from '@/types/portfolio';
-import { StepNavigation } from './step-navigation';
+import type { Portfolio, PortfolioSection } from '@/types/portfolio';
 import { SectionRenderer } from './section-renderer';
 import { ImageGallery } from './image-gallery';
 import { ProjectHero } from './project-hero';
 import { BeforeAfter } from './before-after';
 import { Timeline } from './timeline';
 
-interface StepDefinition {
-  number: number;
+interface TocItem {
+  id: string;
   label: string;
-  sectionTypes: PortfolioSectionType[];
 }
 
-const DEFAULT_STEP_LABELS = ['과제', '솔루션', '결과', '아키텍처'];
+function buildToc(portfolio: Portfolio): TocItem[] {
+  const items: TocItem[] = [];
 
-function buildStepsFromSections(
-  portfolio: Portfolio,
-  sections: PortfolioSection[],
-): { steps: StepDefinition[]; sectionsByStep: Map<number, PortfolioSection[]> } {
-  const sorted = [...sections].sort((a, b) => a.displayOrder - b.displayOrder);
-  const sectionsByStep = new Map<number, PortfolioSection[]>();
-
-  // 섹션의 title로 스텝 라벨을 결정, 같은 title은 같은 스텝으로 묶음
-  const titleToStep = new Map<string, number>();
-  let stepCounter = 0;
-
-  for (const section of sorted) {
-    const title = section.title || `섹션 ${section.displayOrder}`;
-    let stepNum = titleToStep.get(title);
-
-    if (stepNum === undefined) {
-      stepCounter++;
-      stepNum = stepCounter;
-      titleToStep.set(title, stepNum);
-    }
-
-    const existing = sectionsByStep.get(stepNum) || [];
-    existing.push(section);
-    sectionsByStep.set(stepNum, existing);
+  // 타임라인
+  if (portfolio.milestones && portfolio.milestones.length > 0) {
+    items.push({ id: 'timeline', label: '프로젝트 타임라인' });
   }
 
-  // Before/After 데이터가 있으면 맨 앞에 스텝 추가
-  const hasPortfolioBA =
+  // Before/After
+  if (
     portfolio.beforeItems &&
     portfolio.beforeItems.length > 0 &&
     portfolio.afterItems &&
-    portfolio.afterItems.length > 0;
-
-  const steps: StepDefinition[] = [];
-
-  if (hasPortfolioBA) {
-    // 모든 기존 스텝 번호를 +1 shift
-    const shifted = new Map<number, PortfolioSection[]>();
-    for (const [num, secs] of sectionsByStep) {
-      shifted.set(num + 1, secs);
-    }
-    sectionsByStep.clear();
-    for (const [num, secs] of shifted) {
-      sectionsByStep.set(num, secs);
-    }
-
-    steps.push({ number: 1, label: 'Before/After', sectionTypes: [] });
-
-    for (const [title, _origNum] of titleToStep) {
-      const newNum = _origNum + 1;
-      steps.push({ number: newNum, label: title, sectionTypes: [] });
-    }
-  } else {
-    for (const [title, num] of titleToStep) {
-      steps.push({ number: num, label: title, sectionTypes: [] });
-    }
+    portfolio.afterItems.length > 0
+  ) {
+    items.push({ id: 'before-after', label: 'Before / After' });
   }
 
-  steps.sort((a, b) => a.number - b.number);
-  return { steps, sectionsByStep };
+  // 섹션
+  const sorted = [...portfolio.sections].sort((a, b) => a.displayOrder - b.displayOrder);
+  for (const section of sorted) {
+    const title = section.title || `섹션 ${section.displayOrder}`;
+    items.push({ id: `section-${section.id}`, label: title });
+  }
+
+  return items;
 }
 
 interface PortfolioDetailClientProps {
@@ -84,27 +46,15 @@ interface PortfolioDetailClientProps {
 }
 
 export function PortfolioDetailClient({ portfolio }: PortfolioDetailClientProps): JSX.Element {
-  const [activeStep, setActiveStep] = useState(1);
-  const stepRefs = useRef<Map<number, HTMLDivElement>>(new Map());
+  const [activeId, setActiveId] = useState<string>('');
+  const tocItems = buildToc(portfolio);
+  const sortedSections = [...portfolio.sections].sort((a, b) => a.displayOrder - b.displayOrder);
 
-  const { steps: availableSteps, sectionsByStep } = buildStepsFromSections(
-    portfolio,
-    portfolio.sections,
-  );
-
-  const setStepRef = useCallback((stepNumber: number, el: HTMLDivElement | null) => {
+  const handleTocClick = useCallback((id: string) => {
+    const el = document.getElementById(id);
     if (el) {
-      stepRefs.current.set(stepNumber, el);
-    } else {
-      stepRefs.current.delete(stepNumber);
-    }
-  }, []);
-
-  const handleStepClick = useCallback((stepNumber: number) => {
-    const el = stepRefs.current.get(stepNumber);
-    if (el) {
-      const headerOffset = 128;
-      const top = el.getBoundingClientRect().top + window.scrollY - headerOffset;
+      const offset = 100;
+      const top = el.getBoundingClientRect().top + window.scrollY - offset;
       window.scrollTo({ top, behavior: 'smooth' });
     }
   }, []);
@@ -114,100 +64,91 @@ export function PortfolioDetailClient({ portfolio }: PortfolioDetailClientProps)
       (entries) => {
         for (const entry of entries) {
           if (entry.isIntersecting) {
-            const stepNum = Number(entry.target.getAttribute('data-step'));
-            if (stepNum) {
-              setActiveStep(stepNum);
-            }
+            setActiveId(entry.target.id);
           }
         }
       },
-      { rootMargin: '-140px 0px -60% 0px', threshold: 0.1 }
+      { rootMargin: '-120px 0px -60% 0px', threshold: 0.1 },
     );
 
-    for (const [, el] of stepRefs.current) {
-      observer.observe(el);
+    for (const item of tocItems) {
+      const el = document.getElementById(item.id);
+      if (el) observer.observe(el);
     }
 
     return () => observer.disconnect();
-  }, [availableSteps]);
+  }, [tocItems]);
 
   return (
-    <article className="pb-16 px-4">
-      <div className="max-w-4xl mx-auto">
-        {/* Project Hero (fixed above steps) */}
+    <article className="pb-16">
+      <div className="max-w-4xl mx-auto px-4">
+        {/* Project Hero */}
         <ProjectHero portfolio={portfolio} />
 
-        {/* Step Navigation Bar */}
-        {availableSteps.length > 1 && (
-          <StepNavigation
-            steps={availableSteps}
-            activeStep={activeStep}
-            onStepClick={handleStepClick}
-          />
+        {/* 목차 */}
+        {tocItems.length > 1 && (
+          <nav className="my-8 p-4 bg-gray-50 rounded-lg border border-gray-200">
+            <h2 className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-3">목차</h2>
+            <ul className="space-y-1.5">
+              {tocItems.map((item) => (
+                <li key={item.id}>
+                  <button
+                    onClick={() => handleTocClick(item.id)}
+                    className={`text-sm text-left w-full px-2 py-1 rounded transition-colors ${
+                      activeId === item.id
+                        ? 'text-blue-600 bg-blue-50 font-medium'
+                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                    }`}
+                  >
+                    {item.label}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </nav>
         )}
 
-        {/* Step Contents */}
-        <div className="space-y-12 mt-8">
-          {availableSteps.map((step) => (
-            <div
-              key={step.number}
-              ref={(el) => setStepRef(step.number, el)}
-              data-step={step.number}
-              className="scroll-mt-32"
+        {/* 프로젝트 타임라인 (상단) */}
+        {portfolio.milestones && portfolio.milestones.length > 0 && (
+          <section id="timeline" className="mb-12 scroll-mt-28">
+            <h2 className="text-xl font-bold text-gray-900 mb-6 pb-2 border-b border-gray-200">
+              프로젝트 타임라인
+            </h2>
+            <Timeline milestones={portfolio.milestones} />
+          </section>
+        )}
+
+        {/* Before/After */}
+        {portfolio.beforeItems &&
+          portfolio.beforeItems.length > 0 &&
+          portfolio.afterItems &&
+          portfolio.afterItems.length > 0 && (
+            <section id="before-after" className="mb-12 scroll-mt-28">
+              <h2 className="text-xl font-bold text-gray-900 mb-6 pb-2 border-b border-gray-200">
+                Before / After
+              </h2>
+              <BeforeAfter
+                beforeItems={portfolio.beforeItems}
+                afterItems={portfolio.afterItems}
+              />
+            </section>
+          )}
+
+        {/* 섹션 콘텐츠 (Markdown 중심) */}
+        <div className="space-y-12">
+          {sortedSections.map((section) => (
+            <section
+              key={section.id}
+              id={`section-${section.id}`}
+              className="scroll-mt-28"
             >
-              <div className="flex items-center gap-3 mb-6">
-                <span className="text-sm font-bold text-blue-600">
-                  {String(step.number).padStart(2, '0')}
-                </span>
-                <h2 className="text-xl font-bold text-gray-900">{step.label}</h2>
-              </div>
-
-              {/* Step 1: Before/After */}
-              {step.number === 1 && (
-                <div className="space-y-8">
-                  {portfolio.beforeItems &&
-                    portfolio.beforeItems.length > 0 &&
-                    portfolio.afterItems &&
-                    portfolio.afterItems.length > 0 && (
-                      <BeforeAfter
-                        beforeItems={portfolio.beforeItems}
-                        afterItems={portfolio.afterItems}
-                      />
-                    )}
-                  {(sectionsByStep.get(step.number) || []).map((section) => (
-                    <SectionRenderer key={section.id} section={section} />
-                  ))}
-                </div>
+              {section.title && (
+                <h2 className="text-xl font-bold text-gray-900 mb-6 pb-2 border-b border-gray-200">
+                  {section.title}
+                </h2>
               )}
-
-              {/* Step 4: Architecture + Timeline */}
-              {step.number === 4 && (
-                <div className="space-y-8">
-                  {(sectionsByStep.get(step.number) || []).map((section) => (
-                    <SectionRenderer key={section.id} section={section} />
-                  ))}
-                  {portfolio.milestones && portfolio.milestones.length > 0 && (
-                    <div>
-                      <h3 className="text-lg font-bold text-gray-900 mb-4">프로젝트 타임라인</h3>
-                      <Timeline milestones={portfolio.milestones} />
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* Steps 2, 3: Regular section rendering */}
-              {step.number !== 1 && step.number !== 4 && (
-                <div className="space-y-8">
-                  {(sectionsByStep.get(step.number) || []).length > 0 ? (
-                    (sectionsByStep.get(step.number) || []).map((section) => (
-                      <SectionRenderer key={section.id} section={section} />
-                    ))
-                  ) : (
-                    <p className="text-gray-400 text-sm py-4">이 단계의 콘텐츠가 아직 없습니다.</p>
-                  )}
-                </div>
-              )}
-            </div>
+              <SectionRenderer section={{ ...section, title: undefined }} />
+            </section>
           ))}
         </div>
 

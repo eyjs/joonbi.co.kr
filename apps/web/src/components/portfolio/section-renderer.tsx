@@ -19,11 +19,10 @@ interface SectionRendererProps {
 
 export function SectionRenderer({ section }: SectionRendererProps): JSX.Element {
   return (
-    <div className="mb-6">
+    <div>
       {section.title && (
         <h3 className="text-lg font-bold text-gray-900 mb-3">{section.title}</h3>
       )}
-
       {renderContent(section)}
     </div>
   );
@@ -48,7 +47,9 @@ function renderContent(section: PortfolioSection): JSX.Element {
 
     case 'DIAGRAM':
       return section.diagramCode ? (
-        <MermaidDiagram code={section.diagramCode} diagramKind={section.diagramKind} />
+        <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 overflow-x-auto">
+          <MermaidDiagram code={section.diagramCode} diagramKind={section.diagramKind} />
+        </div>
       ) : (
         <p className="text-gray-400 text-sm">다이어그램 코드가 없습니다.</p>
       );
