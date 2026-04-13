@@ -10,7 +10,7 @@ import {
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { PortfolioDisplay } from '@prisma/client';
+import { Prisma, PortfolioDisplay } from '@prisma/client';
 
 export class CreatePortfolioImageDto {
   @ApiProperty({ description: '이미지 URL', example: 'https://example.com/image.jpg' })
@@ -87,6 +87,33 @@ export class CreatePortfolioDto {
   @IsOptional()
   @IsString()
   clientName?: string;
+
+  @ApiPropertyOptional({ description: '한줄 요약', example: '6,177개 학교 공문 자동 발송 RPA' })
+  @IsOptional()
+  @IsString()
+  summary?: string;
+
+  @ApiPropertyOptional({ description: '프로젝트 기간', example: '2026.03 ~ 2026.04' })
+  @IsOptional()
+  @IsString()
+  duration?: string;
+
+  @ApiPropertyOptional({ description: '대표 영상 URL', example: 'https://youtube.com/watch?v=...' })
+  @IsOptional()
+  @IsString()
+  heroVideoUrl?: string;
+
+  @ApiPropertyOptional({ description: 'Before 항목 [{icon, text}]' })
+  @IsOptional()
+  beforeItems?: Prisma.InputJsonValue;
+
+  @ApiPropertyOptional({ description: 'After 항목 [{icon, text}]' })
+  @IsOptional()
+  afterItems?: Prisma.InputJsonValue;
+
+  @ApiPropertyOptional({ description: '타임라인 [{date, title, status}]' })
+  @IsOptional()
+  milestones?: Prisma.InputJsonValue;
 
   @ApiPropertyOptional({
     description: '포트폴리오 이미지 목록',

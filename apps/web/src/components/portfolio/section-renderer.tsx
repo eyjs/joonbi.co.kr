@@ -6,6 +6,7 @@ import { MarkdownContent } from './markdown-content';
 import { VideoPlayer } from './video-player';
 import { DocumentViewer } from './document-viewer';
 import { ImageGallery } from './image-gallery';
+import { ScreenshotGallery } from './screenshot-gallery';
 
 const MermaidDiagram = dynamic(
   () => import('./mermaid-diagram').then((mod) => ({ default: mod.MermaidDiagram })),
@@ -61,6 +62,20 @@ function renderContent(section: PortfolioSection): JSX.Element {
 
     case 'IMAGES':
       return <p className="text-gray-400 text-sm">이미지 갤러리는 상단 이미지 섹션을 참조하세요.</p>;
+
+    case 'SCREENSHOT':
+      return section.imageUrls && section.imageUrls.length > 0 ? (
+        <ScreenshotGallery images={section.imageUrls} caption={section.caption} />
+      ) : (
+        <p className="text-gray-400 text-sm">스크린샷이 없습니다.</p>
+      );
+
+    case 'BEFORE_AFTER':
+      return section.textContent ? (
+        <MarkdownContent content={section.textContent} />
+      ) : (
+        <p className="text-gray-400 text-sm">내용이 없습니다.</p>
+      );
 
     default:
       return <p className="text-gray-400 text-sm">알 수 없는 섹션 타입입니다.</p>;

@@ -1,5 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { PortfolioDisplay, PortfolioSectionType } from '@prisma/client';
+import type { JsonValue } from '@prisma/client/runtime/library';
 
 export class PortfolioImageDto {
   @ApiProperty({ description: '이미지 ID' })
@@ -46,6 +47,12 @@ export class PortfolioSectionResponseDto {
   @ApiPropertyOptional({ description: '원본 파일명' })
   fileName?: string;
 
+  @ApiPropertyOptional({ description: '캡션' })
+  caption?: string;
+
+  @ApiPropertyOptional({ description: '이미지 URL 목록', type: [String] })
+  imageUrls?: string[];
+
   @ApiProperty({ description: '생성 시각' })
   createdAt: Date;
 
@@ -89,6 +96,24 @@ export class PortfolioResponseDto {
 
   @ApiPropertyOptional({ description: '클라이언트명' })
   clientName?: string;
+
+  @ApiPropertyOptional({ description: '한줄 요약' })
+  summary?: string;
+
+  @ApiPropertyOptional({ description: '프로젝트 기간' })
+  duration?: string;
+
+  @ApiPropertyOptional({ description: '대표 영상 URL' })
+  heroVideoUrl?: string;
+
+  @ApiPropertyOptional({ description: 'Before 항목' })
+  beforeItems?: JsonValue;
+
+  @ApiPropertyOptional({ description: 'After 항목' })
+  afterItems?: JsonValue;
+
+  @ApiPropertyOptional({ description: '타임라인' })
+  milestones?: JsonValue;
 
   @ApiPropertyOptional({ description: '이미지 목록', type: [PortfolioImageDto] })
   images?: PortfolioImageDto[];

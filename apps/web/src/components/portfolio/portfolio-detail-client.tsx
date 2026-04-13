@@ -3,8 +3,11 @@
 import { useRef, useState, useEffect, useCallback } from 'react';
 import type { Portfolio, PortfolioSection, PortfolioSectionType } from '@/types/portfolio';
 import { StepNavigation } from './step-navigation';
-import { StepContent } from './step-content';
+import { SectionRenderer } from './section-renderer';
 import { ImageGallery } from './image-gallery';
+import { ProjectHero } from './project-hero';
+import { BeforeAfter } from './before-after';
+import { Timeline } from './timeline';
 
 interface StepDefinition {
   number: number;
@@ -13,9 +16,9 @@ interface StepDefinition {
 }
 
 const STEP_DEFINITIONS: StepDefinition[] = [
-  { number: 1, label: '과제', sectionTypes: ['OVERVIEW'] },
-  { number: 2, label: '솔루션', sectionTypes: ['BRIEF'] },
-  { number: 3, label: '결과', sectionTypes: ['VIDEO', 'IMAGES', 'DOCUMENT'] },
+  { number: 1, label: 'Before/After', sectionTypes: ['BEFORE_AFTER'] },
+  { number: 2, label: '솔루션', sectionTypes: ['BRIEF', 'OVERVIEW'] },
+  { number: 3, label: '결과', sectionTypes: ['VIDEO', 'IMAGES', 'DOCUMENT', 'SCREENSHOT'] },
   { number: 4, label: '아키텍처', sectionTypes: ['DIAGRAM'] },
 ];
 
@@ -37,6 +40,31 @@ function groupSectionsByStep(sections: PortfolioSection[]): Map<number, Portfoli
   return map;
 }
 
+function getAvailableSteps(
+  portfolio: Portfolio,
+  sectionsByStep: Map<number, PortfolioSection[]>,
+): StepDefinition[] {
+  return STEP_DEFINITIONS.filter((s) => {
+    // Step 1 is available if there are BA sections or portfolio-level beforeItems/afterItems
+    if (s.number === 1) {
+      const hasSections = sectionsByStep.has(s.number);
+      const hasPortfolioBA =
+        portfolio.beforeItems &&
+        portfolio.beforeItems.length > 0 &&
+        portfolio.afterItems &&
+        portfolio.afterItems.length > 0;
+      return hasSections || hasPortfolioBA;
+    }
+    // Step 4 is available if there are diagram sections or milestones
+    if (s.number === 4) {
+      const hasSections = sectionsByStep.has(s.number);
+      const hasMilestones = portfolio.milestones && portfolio.milestones.length > 0;
+      return hasSections || hasMilestones;
+    }
+    return sectionsByStep.has(s.number);
+  });
+}
+
 interface PortfolioDetailClientProps {
   portfolio: Portfolio;
 }
@@ -46,7 +74,7 @@ export function PortfolioDetailClient({ portfolio }: PortfolioDetailClientProps)
   const stepRefs = useRef<Map<number, HTMLDivElement>>(new Map());
 
   const sectionsByStep = groupSectionsByStep(portfolio.sections);
-  const availableSteps = STEP_DEFINITIONS.filter((s) => sectionsByStep.has(s.number));
+  const availableSteps = getAvailableSteps(portfolio, sectionsByStep);
 
   const setStepRef = useCallback((stepNumber: number, el: HTMLDivElement | null) => {
     if (el) {
@@ -87,58 +115,11 @@ export function PortfolioDetailClient({ portfolio }: PortfolioDetailClientProps)
     return () => observer.disconnect();
   }, [availableSteps]);
 
-  const completedDate = portfolio.completedAt
-    ? new Date(portfolio.completedAt).toLocaleDateString('ko-KR', {
-        year: 'numeric',
-        month: 'long',
-      })
-    : null;
-
   return (
     <article className="pb-16 px-4">
       <div className="max-w-4xl mx-auto">
-        {/* Header info */}
-        <header className="pt-12 mb-8">
-          {portfolio.category && (
-            <span className="text-xs font-medium text-blue-600 uppercase tracking-wider">
-              {portfolio.category}
-            </span>
-          )}
-
-          <h1 className="heading-lg mt-2">{portfolio.title}</h1>
-
-          {portfolio.description && (
-            <p className="text-gray-500 mt-4 text-lg">{portfolio.description}</p>
-          )}
-
-          <div className="flex flex-wrap items-center gap-4 mt-4 text-sm text-gray-400">
-            {completedDate && <span>완료: {completedDate}</span>}
-            {portfolio.displayType === 'FULL' && portfolio.clientName && (
-              <span>클라이언트: {portfolio.clientName}</span>
-            )}
-          </div>
-
-          {portfolio.techStack && portfolio.techStack.length > 0 && (
-            <div className="flex flex-wrap gap-2 mt-4">
-              {portfolio.techStack.map((tech) => (
-                <span key={tech} className="badge-primary text-xs px-3 py-1 rounded-full badge">
-                  {tech}
-                </span>
-              ))}
-            </div>
-          )}
-        </header>
-
-        {/* Thumbnail */}
-        {portfolio.thumbnailUrl && (
-          <div className="aspect-video rounded-xl overflow-hidden mb-8 border border-gray-200">
-            <img
-              src={portfolio.thumbnailUrl}
-              alt={portfolio.title}
-              className="w-full h-full object-cover"
-            />
-          </div>
-        )}
+        {/* Project Hero (fixed above steps) */}
+        <ProjectHero portfolio={portfolio} />
 
         {/* Step Navigation Bar */}
         {availableSteps.length > 1 && (
@@ -152,19 +133,72 @@ export function PortfolioDetailClient({ portfolio }: PortfolioDetailClientProps)
         {/* Step Contents */}
         <div className="space-y-12 mt-8">
           {availableSteps.map((step) => (
-            <StepContent
+            <div
               key={step.number}
-              step={step}
-              sections={sectionsByStep.get(step.number) || []}
               ref={(el) => setStepRef(step.number, el)}
-            />
+              data-step={step.number}
+              className="scroll-mt-32"
+            >
+              <div className="flex items-center gap-3 mb-6">
+                <span className="text-sm font-bold text-blue-600">
+                  {String(step.number).padStart(2, '0')}
+                </span>
+                <h2 className="text-xl font-bold text-gray-900">{step.label}</h2>
+              </div>
+
+              {/* Step 1: Before/After */}
+              {step.number === 1 && (
+                <div className="space-y-8">
+                  {portfolio.beforeItems &&
+                    portfolio.beforeItems.length > 0 &&
+                    portfolio.afterItems &&
+                    portfolio.afterItems.length > 0 && (
+                      <BeforeAfter
+                        beforeItems={portfolio.beforeItems}
+                        afterItems={portfolio.afterItems}
+                      />
+                    )}
+                  {(sectionsByStep.get(step.number) || []).map((section) => (
+                    <SectionRenderer key={section.id} section={section} />
+                  ))}
+                </div>
+              )}
+
+              {/* Step 4: Architecture + Timeline */}
+              {step.number === 4 && (
+                <div className="space-y-8">
+                  {(sectionsByStep.get(step.number) || []).map((section) => (
+                    <SectionRenderer key={section.id} section={section} />
+                  ))}
+                  {portfolio.milestones && portfolio.milestones.length > 0 && (
+                    <div>
+                      <h3 className="text-lg font-bold text-gray-900 mb-4">프로젝트 타임라인</h3>
+                      <Timeline milestones={portfolio.milestones} />
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Steps 2, 3: Regular section rendering */}
+              {step.number !== 1 && step.number !== 4 && (
+                <div className="space-y-8">
+                  {(sectionsByStep.get(step.number) || []).length > 0 ? (
+                    (sectionsByStep.get(step.number) || []).map((section) => (
+                      <SectionRenderer key={section.id} section={section} />
+                    ))
+                  ) : (
+                    <p className="text-gray-400 text-sm py-4">이 단계의 콘텐츠가 아직 없습니다.</p>
+                  )}
+                </div>
+              )}
+            </div>
           ))}
         </div>
 
         {/* Legacy images */}
         {portfolio.images && portfolio.images.length > 0 && (
           <div className="mt-12">
-            <h2 className="heading-sm mb-4">스크린샷</h2>
+            <h2 className="text-xl font-bold text-gray-900 mb-4">스크린샷</h2>
             <ImageGallery images={portfolio.images} />
           </div>
         )}

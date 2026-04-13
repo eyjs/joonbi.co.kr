@@ -355,6 +355,14 @@ model Portfolio {
   completedAt     DateTime?
   clientName      String?
 
+  // 고도화 필드
+  summary         String?
+  duration        String?
+  heroVideoUrl    String?
+  beforeItems     Json?
+  afterItems      Json?
+  milestones      Json?
+
   images          PortfolioImage[]
   sections        PortfolioSection[]
 
@@ -396,6 +404,8 @@ model PortfolioSection {
   diagramKind   String?             // DIAGRAM 타입 — flowchart | sequence | erd | etc.
   fileUrl       String?             // DOCUMENT 타입 — PDF/이미지 GCS URL
   fileName      String?             // DOCUMENT 타입 — 원본 파일명
+  caption       String?             // SCREENSHOT, VIDEO 타입 — 캡션
+  imageUrls     String[]  @default([])  // SCREENSHOT 타입 — 이미지 URL 목록
 
   createdAt     DateTime            @default(now())
   updatedAt     DateTime            @updatedAt
@@ -408,6 +418,8 @@ enum PortfolioSectionType {
   DIAGRAM
   DOCUMENT
   IMAGES
+  SCREENSHOT
+  BEFORE_AFTER
 }
 
 // ==================== 이벤트 ====================

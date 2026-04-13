@@ -16,6 +16,8 @@ const SECTION_TYPE_LABELS: Record<string, string> = {
   DIAGRAM: '다이어그램',
   DOCUMENT: '산출문서',
   IMAGES: '이미지 갤러리',
+  SCREENSHOT: '스크린샷 갤러리',
+  BEFORE_AFTER: 'Before/After',
 };
 
 export function SectionEditor({
@@ -34,6 +36,8 @@ export function SectionEditor({
   const [diagramKind, setDiagramKind] = useState(section.diagramKind || '');
   const [fileUrl, setFileUrl] = useState(section.fileUrl || '');
   const [fileName, setFileName] = useState(section.fileName || '');
+  const [caption, setCaption] = useState(section.caption || '');
+  const [imageUrls, setImageUrls] = useState<string[]>(section.imageUrls || []);
 
   const handleSave = async (): Promise<void> => {
     setSaving(true);
@@ -47,6 +51,7 @@ export function SectionEditor({
           break;
         case 'VIDEO':
           data.videoUrl = videoUrl;
+          data.caption = caption || undefined;
           break;
         case 'DIAGRAM':
           data.diagramCode = diagramCode;
@@ -55,6 +60,13 @@ export function SectionEditor({
         case 'DOCUMENT':
           data.fileUrl = fileUrl;
           data.fileName = fileName || undefined;
+          break;
+        case 'SCREENSHOT':
+          data.imageUrls = imageUrls;
+          data.caption = caption || undefined;
+          break;
+        case 'BEFORE_AFTER':
+          data.textContent = textContent;
           break;
         default:
           break;
@@ -65,6 +77,12 @@ export function SectionEditor({
       setSaving(false);
     }
   };
+
+  const addImageUrl = (): void => setImageUrls((prev) => [...prev, '']);
+  const removeImageUrl = (index: number): void =>
+    setImageUrls((prev) => prev.filter((_, i) => i !== index));
+  const updateImageUrl = (index: number, value: string): void =>
+    setImageUrls((prev) => prev.map((url, i) => (i === index ? value : url)));
 
   return (
     <div className="border border-gray-200 rounded-lg overflow-hidden">
@@ -106,8 +124,10 @@ export function SectionEditor({
             />
           </div>
 
-          {/* OVERVIEW / BRIEF */}
-          {(section.sectionType === 'OVERVIEW' || section.sectionType === 'BRIEF') && (
+          {/* OVERVIEW / BRIEF / BEFORE_AFTER */}
+          {(section.sectionType === 'OVERVIEW' ||
+            section.sectionType === 'BRIEF' ||
+            section.sectionType === 'BEFORE_AFTER') && (
             <div>
               <label htmlFor={`text-${section.id}`} className="block text-xs font-medium text-gray-600 mb-1">
                 마크다운 내용
@@ -125,19 +145,34 @@ export function SectionEditor({
 
           {/* VIDEO */}
           {section.sectionType === 'VIDEO' && (
-            <div>
-              <label htmlFor={`video-${section.id}`} className="block text-xs font-medium text-gray-600 mb-1">
-                동영상 URL (YouTube, Vimeo, GCS 등)
-              </label>
-              <input
-                id={`video-${section.id}`}
-                type="url"
-                value={videoUrl}
-                onChange={(e) => setVideoUrl(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="https://youtube.com/watch?v=..."
-              />
-            </div>
+            <>
+              <div>
+                <label htmlFor={`video-${section.id}`} className="block text-xs font-medium text-gray-600 mb-1">
+                  동영상 URL (YouTube, Vimeo, GCS 등)
+                </label>
+                <input
+                  id={`video-${section.id}`}
+                  type="url"
+                  value={videoUrl}
+                  onChange={(e) => setVideoUrl(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="https://youtube.com/watch?v=..."
+                />
+              </div>
+              <div>
+                <label htmlFor={`caption-video-${section.id}`} className="block text-xs font-medium text-gray-600 mb-1">
+                  캡션 (선택)
+                </label>
+                <input
+                  id={`caption-video-${section.id}`}
+                  type="text"
+                  value={caption}
+                  onChange={(e) => setCaption(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="영상에 대한 설명"
+                />
+              </div>
+            </>
           )}
 
           {/* DIAGRAM */}
@@ -202,6 +237,63 @@ export function SectionEditor({
                 />
               </div>
             </div>
+          )}
+
+          {/* SCREENSHOT */}
+          {section.sectionType === 'SCREENSHOT' && (
+            <>
+              <div>
+                <label htmlFor={`caption-ss-${section.id}`} className="block text-xs font-medium text-gray-600 mb-1">
+                  캡션
+                </label>
+                <input
+                  id={`caption-ss-${section.id}`}
+                  type="text"
+                  value={caption}
+                  onChange={(e) => setCaption(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="스크린샷에 대한 설명"
+                />
+              </div>
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-xs font-medium text-gray-600">이미지 URL 목록</label>
+                  <button
+                    type="button"
+                    onClick={addImageUrl}
+                    className="text-xs px-3 py-1 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-gray-700"
+                  >
+                    + URL 추가
+                  </button>
+                </div>
+                {imageUrls.length === 0 ? (
+                  <p className="text-gray-400 text-sm py-2">이미지가 없습니다.</p>
+                ) : (
+                  <div className="space-y-2">
+                    {imageUrls.map((url, index) => (
+                      <div key={index} className="flex items-center gap-2">
+                        <input
+                          type="url"
+                          value={url}
+                          onChange={(e) => updateImageUrl(index, e.target.value)}
+                          className="flex-1 px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          placeholder="https://example.com/screenshot.png"
+                          aria-label={`스크린샷 URL ${index + 1}`}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => removeImageUrl(index)}
+                          className="text-xs text-red-500 hover:text-red-700 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-red-300 rounded"
+                          aria-label={`스크린샷 URL ${index + 1} 삭제`}
+                        >
+                          삭제
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </>
           )}
 
           <div className="flex justify-end">

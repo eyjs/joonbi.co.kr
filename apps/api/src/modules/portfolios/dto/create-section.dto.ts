@@ -4,6 +4,7 @@ import {
   IsOptional,
   IsEnum,
   IsInt,
+  IsArray,
   Min,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
@@ -59,4 +60,15 @@ export class CreateSectionDto {
   @IsOptional()
   @IsString()
   fileName?: string;
+
+  @ApiPropertyOptional({ description: '캡션 (SCREENSHOT, VIDEO 타입)' })
+  @IsOptional()
+  @IsString()
+  caption?: string;
+
+  @ApiPropertyOptional({ description: '이미지 URL 목록 (SCREENSHOT 타입)', type: [String] })
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  imageUrls?: string[];
 }

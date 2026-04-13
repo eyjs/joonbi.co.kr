@@ -4,9 +4,22 @@ export type PortfolioSectionType =
   | 'VIDEO'
   | 'DIAGRAM'
   | 'DOCUMENT'
-  | 'IMAGES';
+  | 'IMAGES'
+  | 'SCREENSHOT'
+  | 'BEFORE_AFTER';
 
 export type PortfolioDisplay = 'FULL' | 'ANONYMOUS' | 'PRIVATE';
+
+export interface BeforeAfterItem {
+  icon: string;
+  text: string;
+}
+
+export interface Milestone {
+  date: string;
+  title: string;
+  status: string;
+}
 
 export interface PortfolioImage {
   id: string;
@@ -26,6 +39,8 @@ export interface PortfolioSection {
   diagramKind?: string;
   fileUrl?: string;
   fileName?: string;
+  caption?: string;
+  imageUrls?: string[];
   createdAt: string;
   updatedAt: string;
 }
@@ -43,6 +58,12 @@ export interface Portfolio {
   category?: string;
   completedAt?: string;
   clientName?: string;
+  summary?: string;
+  duration?: string;
+  heroVideoUrl?: string;
+  beforeItems?: BeforeAfterItem[];
+  afterItems?: BeforeAfterItem[];
+  milestones?: Milestone[];
   images: PortfolioImage[];
   sections: PortfolioSection[];
   project?: {

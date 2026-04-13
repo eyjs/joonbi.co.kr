@@ -95,7 +95,7 @@ export class PortfoliosService {
     ]);
 
     return {
-      data,
+      data: data.map((p) => this.maskAnonymous(p)),
       meta: { total, page, limit },
     };
   }
@@ -350,6 +350,11 @@ export class PortfoliosService {
     if (!portfolio) {
       throw new NotFoundException('포트폴리오를 찾을 수 없습니다');
     }
+  }
+
+  /** 목록용 마스킹 (sanitizeByDisplayType 재사용) */
+  private maskAnonymous(portfolio: Portfolio): Portfolio {
+    return this.sanitizeByDisplayType(portfolio);
   }
 
   /** displayType=ANONYMOUS이면 clientName, projectName 숨김 */
